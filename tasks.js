@@ -64,6 +64,7 @@ function mapStatus(raw){
 
 function badge(st){
   if (st === "accepted") return "✅ جارية";
+  if (st === "waiting_proof") return "📎 مطلوب إثبات";
   if (st === "completed") return "🏁 مكتملة";
   if (st === "expired") return "⛔ منتهية";
   return "⏳ معلّقة";
@@ -90,7 +91,7 @@ async function markTaskAccepted(id){
     await addDoc(collection(db, NOTI_COL), {
       uid: currentUid,
       title: "تم بدء المهمة ✅",
-      message: `تم قبول المهمة: ${t.title || "مهمة"} — الوقت بدأ الآن.`,
+      message: `تم قبول المهمة: ${t.title || "مهمة"} — الوقت بدأ الآن. (نقاط: ${Number(t.points||0) || ""})`,
       type: "task_accepted",
       read: false,
       readAt: null,
@@ -168,6 +169,7 @@ async function loadTasks(){
     tasksList.innerHTML = filtered.map(t=>{
       const st = mapStatus(t.status);
       const dur = Number(t.durationHours || 0);
+      const pts = Number(t.points || 0);
       return `
         <article class="card" style="padding:14px;border-radius:16px">
           <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
@@ -176,13 +178,17 @@ async function loadTasks(){
           </div>
           ${t.details ? `<div style="margin-top:8px;line-height:1.9;color:#334155">${t.details}</div>` : ""}
           <div style="margin-top:8px;color:#64748b;line-height:1.9">
-            المدة: <b>${dur}</b> ساعة
+            المدة: <b>${dur}</b> ساعة • النقاط: <b>${Number.isFinite(pts)?pts:0}</b> • النقاط: <b>${Number.isFinite(pts)?pts:0}</b>
             <div id="timer-${t.id}" style="margin-top:6px; font-weight:800"></div>
           </div>
 
           <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap">
             ${st === "pending" ? `<button class="btn btn--solid" data-accept="${t.id}" type="button">موافقة وبدء العداد</button>` : ""}
             ${st === "accepted" ? `<button class="btn btn--solid" data-complete="${t.id}" type="button">تم التنفيذ ✅</button>` : ""}
+            ${st === "waiting_proof" ? `<label class="btn" style="cursor:pointer">📎 اختر ملف إثبات<input type="file" data-proof="${t.id}" style="display:none" accept="image/*,application/pdf" /></label>
+            <button class="btn btn--solid" data-sendproof="${t.id}" type="button">رفع الإثبات</button>` : ""}
+            ${st === "waiting_proof" ? `<label class="btn" style="cursor:pointer">📎 اختر ملف إثبات<input type="file" data-proof="${t.id}" style="display:none" accept="image/*,application/pdf" /></label>
+            <button class="btn btn--solid" data-sendproof="${t.id}" type="button">رفع الإثبات</button>` : ""}
           </div>
         </article>
       `;
@@ -193,6 +199,14 @@ async function loadTasks(){
     });
     tasksList.querySelectorAll("[data-complete]").forEach(btn=>{
       btn.addEventListener("click", ()=> markTaskCompleted(btn.getAttribute("data-complete")));
+    });
+
+    tasksList.querySelectorAll("[data-sendproof]").forEach(btn=>{
+      btn.addEventListener("click", ()=> uploadProof(btn.getAttribute("data-sendproof")));
+    });
+
+    tasksList.querySelectorAll("[data-sendproof]").forEach(btn=>{
+      btn.addEventListener("click", ()=> uploadProof(btn.getAttribute("data-sendproof")));
     });
 
     // Timers
@@ -248,6 +262,77 @@ async function loadTasks(){
 btnRefreshTasks?.addEventListener("click", loadTasks);
 taskFilter?.addEventListener("change", loadTasks);
 taskSearch?.addEventListener("input", loadTasks);
+
+
+async function uploadProof(taskId){
+  if (!currentUid || !taskId) return;
+  const input = tasksList?.querySelector(`input[data-proof="${taskId}"]`);
+  const file = input?.files?.[0];
+  if (!file) return toast("اختار ملف إثبات الأول.", "warn");
+
+  if (!throttleAction("proof-"+taskId, 2000)) return;
+
+  setLoading(true);
+  try{
+    const taskRef = doc(db, TASKS_COL, taskId);
+    const tSnap = await getDoc(taskRef);
+    const t = tSnap.exists() ? (tSnap.data()||{}) : {};
+
+    const path = `task_proofs/${currentUid}/${taskId}/${Date.now()}-${file.name}`.replace(/\s+/g,"_");
+    const fileRef = sRef(storage, path);
+    await uploadBytes(fileRef, file);
+    const url = await getDownloadURL(fileRef);
+
+    // سجل تسليم/إثبات
+    await addDoc(collection(db, SUBMISSIONS_COL), {
+      uid: currentUid,
+      taskId,
+      fileUrl: url,
+      fileName: file.name,
+      fileType: file.type || "",
+      createdAt: serverTimestamp(),
+      kind: "proof",
+    });
+
+    // اكمل المهمة فعليًا + افتح event للنقاط
+    await updateDoc(taskRef, {
+      status: "completed",
+      completedAt: serverTimestamp(),
+      active: false,
+      proofStatus: "uploaded",
+      proofUrl: url,
+      updatedAt: serverTimestamp(),
+    });
+
+    await addDoc(collection(db, TASK_EVENTS_COL), {
+      type: "task_completed",
+      taskId,
+      uid: currentUid,
+      createdAt: serverTimestamp(),
+      processed: false,
+    });
+
+    await addDoc(collection(db, NOTI_COL), {
+      uid: currentUid,
+      title: "تم رفع الإثبات ✅",
+      message: `تم رفع إثبات للمهمة: ${t.title || "مهمة"}.`,
+      type: "task_proof_uploaded",
+      read: false,
+      readAt: null,
+      createdAt: serverTimestamp(),
+      taskId,
+    });
+
+    toast("تم رفع الإثبات وإنهاء المهمة ✅", "success");
+    await loadTasks();
+  }catch(e){
+    console.error(e);
+    toast("تعذر رفع الإثبات.", "error");
+  }finally{
+    setLoading(false);
+  }
+}
+
 
 // Auth
 onAuthStateChanged(auth, (user)=>{

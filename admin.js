@@ -1068,7 +1068,7 @@ async function loadVolunteersForTasks(){
       const data = d.data() || {};
       const uid = data.userUid || data.uid || "";
       const name = data.name || data.fullName || data.email || uid;
-      return { assignedTo: uid,
+      return { uid,
       name, email: data.email || "" };
     }).filter(x => x.uid);
 
@@ -1123,7 +1123,7 @@ async function createTaskForVolunteer(){
     // Notification to volunteer
     await addDoc(collection(db, "notifications"), {
       assignedTo: uid,
-      text: `📌 مهمة جديدة: ${title} (المدة: ${hours} ساعة)`,
+      text: `📌 مهمة جديدة: ${title} (المدة: ${hours} ساعة • النقاط: ${points})`,
       link: `my-profile.html#tasks`,
       seen: false,
       createdAt: serverTimestamp(),
