@@ -19,6 +19,30 @@ try{
 }catch(e){}
 </script>
 
+<script>
+/* ✅ Universal cache/SW fix (runs once per version) */
+(async function() {
+  try {
+    const host = location.hostname;
+    const isLocal = host === "localhost" || host === "127.0.0.1";
+    if (isLocal) return;
+
+    const key = "px_swfix_v";
+    const v = "202602070121";
+    if (localStorage.getItem(key) === v) return;
+    localStorage.setItem(key, v);
+
+    if ("serviceWorker" in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r => r.unregister()));
+    }
+    if (window.caches && caches.keys) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+    }
+  } catch(e) {}
+})();
+</script>
 </head>
 
   <body>
@@ -39,7 +63,7 @@ try{
           <button class="link link--btn" id="langToggle" type="button">
             EN
           </button>
-          <script src="i18n.js"></script>
+          <script src="i18n.js?v=202602070121"></script>
           <button id="btnLogout" type="button">تسجيل خروج</button>
 
           <a class="nav__link" href="index.html">الرئيسية</a>
@@ -161,7 +185,7 @@ try{
       </section>
     </main>
 
-    <script type="module" src="register.js"></script>
+    <script type="module" src="register.js?v=202602070121"></script>
 
     <script>
       if ("serviceWorker" in navigator) {

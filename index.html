@@ -12,12 +12,12 @@
   `;
       };
     </script>
-    <script src="./debug-overlay.js"></script>
+    <script src="./debug-overlay.js?v=202602070121"></script>
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>مؤسسة بيكسولوجي</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=202602070121" />
     <meta name="theme-color" content="#0b1620" />
 
     <style id="local-server-hint-style">
@@ -108,7 +108,31 @@
         }
       } catch (e) {}
     </script>
-  </head>
+  <script>
+/* ✅ Universal cache/SW fix (runs once per version) */
+(async function() {
+  try {
+    const host = location.hostname;
+    const isLocal = host === "localhost" || host === "127.0.0.1";
+    if (isLocal) return;
+
+    const key = "px_swfix_v";
+    const v = "202602070121";
+    if (localStorage.getItem(key) === v) return;
+    localStorage.setItem(key, v);
+
+    if ("serviceWorker" in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r => r.unregister()));
+    }
+    if (window.caches && caches.keys) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+    }
+  } catch(e) {}
+})();
+</script>
+</head>
 
   <body>
     <!-- ===== START GATE SCREEN ===== -->
@@ -333,9 +357,9 @@
     </div>
 
     <!-- ✅ لغة الموقع -->
-    <script src="i18n.js"></script>
+    <script src="i18n.js?v=202602070121"></script>
 
     <!-- ✅ JS الصفحة (Firebase لازم Module) -->
-    <script type="module" src="index.js"></script>
+    <script type="module" src="index.js?v=202602070121"></script>
   </body>
 </html>
