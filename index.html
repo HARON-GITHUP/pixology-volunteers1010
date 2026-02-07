@@ -1,14 +1,19 @@
-<!--
-⚠️ تنبيه مهم:
-هذه الصفحات تعمل بشكل صحيح عند تشغيلها عبر Local Server (وليس file://)
-مثال: Live Server في VS Code أو python -m http.server
-
-ممنوع تمسح الملف ده ❌ لأنه الصفحة الرئيسية للمشروع.
--->
-
 <!doctype html>
 <html lang="ar" dir="rtl">
   <head>
+    <script>
+      window.onerror = function (msg, url, line) {
+        document.body.innerHTML = `
+    <div style="padding:40px;text-align:center;font-family:sans-serif">
+      <h2>⚠️ حصل خطأ</h2>
+      <p>من فضلك اعمل تحديث للصفحة</p>
+      <button onclick="location.reload()">إعادة تحميل</button>
+    </div>
+  `;
+      };
+    </script>
+    <script src="./debug-overlay.js"></script>
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>مؤسسة بيكسولوجي</title>
@@ -91,20 +96,19 @@
         color: #64748b;
       }
     </style>
-  
-<script>
-/* ✅ Fix: Firebase Authorized Domain issue
-   افتح المشروع على localhost بدل 127.0.0.1 */
-try{
-  if (location.hostname === "127.0.0.1") {
-    const u = new URL(location.href);
-    u.hostname = "localhost";
-    location.replace(u.toString());
-  }
-}catch(e){}
-</script>
 
-</head>
+    <script>
+      /* ✅ Fix: Firebase Authorized Domain issue
+   افتح المشروع على localhost بدل 127.0.0.1 */
+      try {
+        if (location.hostname === "127.0.0.1") {
+          const u = new URL(location.href);
+          u.hostname = "localhost";
+          location.replace(u.toString());
+        }
+      } catch (e) {}
+    </script>
+  </head>
 
   <body>
     <!-- ===== START GATE SCREEN ===== -->
@@ -197,7 +201,9 @@ try{
                   >لوحة التحكم</a
                 >
                 <a class="link" href="tasks.html">🧩 مهامي</a>
-                <a class="link" href="certificates.html" data-i18n="navCerts">📜 كل الشهادات</a>
+                <a class="link" href="certificates.html" data-i18n="navCerts"
+                  >📜 كل الشهادات</a
+                >
                 <a class="link" href="achievements.html">🏆 الإنجازات</a>
 
                 <!-- ✅ تقديم طلب تطوع زي الأول -->
