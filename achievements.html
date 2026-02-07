@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>الإنجازات | Pixology</title>
-    <link rel="stylesheet" href="style.css?v=202602070121" />
+    <link rel="stylesheet" href="style.css?v=20260207012958" />
     <meta name="theme-color" content="#0b1620" />
     <script>
       /* ✅ Fix: Firebase Authorized Domain issue */
@@ -16,7 +16,9 @@
         }
       }catch(e){}
     </script>
-  <script>
+  <script src="./polyfills.js?v=20260207012958"></script>
+<script src="./debug-overlay.js?v=20260207012958"></script>
+<script>
 /* ✅ Universal cache/SW fix (runs once per version) */
 (async function() {
   try {
@@ -25,7 +27,7 @@
     if (isLocal) return;
 
     const key = "px_swfix_v";
-    const v = "202602070121";
+    const v = "20260207012958";
     if (localStorage.getItem(key) === v) return;
     localStorage.setItem(key, v);
 
@@ -40,6 +42,7 @@
   } catch(e) {}
 })();
 </script>
+
 </head>
 
   <body>
@@ -100,6 +103,6 @@
       </section>
     </main>
 
-    <script type="module" src="achievements.js?v=202602070121"></script>
+    <script type="module" src="achievements.js?v=20260207012958"></script>
   </body>
 </html>

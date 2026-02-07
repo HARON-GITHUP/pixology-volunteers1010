@@ -1,0 +1,41 @@
+<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>الفعاليات | Pixology</title>
+<link rel="stylesheet" href="style.css?v=202602070248"/><meta name="theme-color" content="#0b1620"/>
+<script src="./debug-overlay.js?v=202602070248"></script></head><body>
+<header class="topnav"><div class="container topnav__wrap">
+<a class="brand" href="index.html"><img src="p.jpg" alt="Pixology" style="width:180px;height:80px"/></a>
+<div class="topnav__actions">
+          <a class="link" href="verify.html">✅ تحقق شهادة</a>
+<a class="link" href="index.html">الرئيسية</a>
+<a class="link" href="leaderboard.html">🏆 الترتيب</a>
+<a class="link" href="events.html">📅 الفعاليات</a>
+<a class="link" href="admin.html">لوحة التحكم</a>
+</div></div></header>
+
+<main class="container" style="padding:22px 0 70px">
+<section class="card" style="padding:18px;border-radius:18px">
+<h1 style="margin:0 0 6px">📅 الفعاليات</h1>
+<p style="margin:0;color:#64748b;line-height:1.9">الفعاليات القادمة + تسجيل حضور.</p>
+</section>
+
+<section class="card" style="margin-top:14px;padding:16px;border-radius:18px">
+<div id="eventsList" class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px"></div>
+</section>
+
+<section class="card" style="margin-top:14px;padding:16px;border-radius:18px">
+<h2 style="margin:0 0 10px">🛠️ إنشاء فعالية (أدمن)</h2>
+<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+<input id="evTitle" placeholder="عنوان الفعالية" style="padding:10px;border-radius:12px"/>
+<input id="evPlace" placeholder="المكان" style="padding:10px;border-radius:12px"/>
+<input id="evDate" type="date" style="padding:10px;border-radius:12px"/>
+<input id="evHours" type="number" min="0" value="2" placeholder="ساعات" style="padding:10px;border-radius:12px"/>
+<input id="evPoints" type="number" min="0" value="20" placeholder="نقاط" style="padding:10px;border-radius:12px"/>
+</div>
+<textarea id="evDesc" placeholder="وصف مختصر" style="width:100%;margin-top:10px;padding:10px;border-radius:12px;min-height:90px"></textarea>
+<button class="btn btn--solid" id="btnCreateEvent" style="margin-top:10px" type="button">إنشاء فعالية</button>
+<div style="color:#64748b;margin-top:8px;line-height:1.9">* إنشاء الفعاليات يحتاج حساب أدمن.</div>
+</section>
+</main>
+
+<script type="module" src="events.js?v=202602070248"></script></body></html>

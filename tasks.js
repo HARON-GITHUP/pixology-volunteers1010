@@ -1,5 +1,5 @@
 // tasks.js
-import { auth, db } from "./firebase.js";
+import { auth, db, storage } from "./firebase.js";
 import { toast, setLoading, throttleAction } from "./ui.js";
 
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
@@ -17,9 +17,12 @@ import {
   serverTimestamp,
   Timestamp,
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import { ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
 
 const TASKS_COL = "tasks";
 const NOTI_COL = "notifications";
+const SUBMISSIONS_COL = "task_submissions";
+const TASK_EVENTS_COL = "task_events";
 
 const taskFilter = document.getElementById("taskFilter");
 const taskSearch = document.getElementById("taskSearch");
@@ -112,11 +115,7 @@ async function markTaskCompleted(id){
   setLoading(true);
   try{
     const ref = doc(db, TASKS_COL, id);
-    await updateDoc(ref, {
-      status: "completed",
-      completedAt: serverTimestamp(),
-      active: false,
-    });
+    await completeTask(id);
 
     await addDoc(collection(db, NOTI_COL), {
       uid: currentUid,
@@ -260,3 +259,39 @@ onAuthStateChanged(auth, (user)=>{
   currentUid = user.uid;
   loadTasks();
 });
+
+const proofFile = document.getElementById('proofFile');
+
+async function completeTask(id){
+  const ref = doc(db, "tasks", id);
+  const snap = await getDoc(ref);
+  const t = snap.exists() ? (snap.data()||{}) : {};
+  const requireProof = t.requireProof === true;
+
+  if (requireProof){
+    await updateDoc(ref, {
+      status: "waiting_proof",
+      proofStatus: "required",
+      updatedAt: serverTimestamp(),
+    });
+    toast("تم تسجيل الإنجاز ✅ ارفع الإثبات من أسفل الصفحة.", "success");
+    await pushNotification(currentUid, "📎 مطلوب إثبات", `ارفع إثبات للمهمة: ${t.title || "مهمة"}`, "info");
+    return;
+  }
+
+  await updateDoc(ref, {
+    status: "completed",
+    completedAt: serverTimestamp(),
+    active: false,
+  });
+
+  await addDoc(collection(db, TASK_EVENTS_COL), {
+    type: "task_completed",
+    taskId: id,
+    uid: currentUid,
+    createdAt: serverTimestamp(),
+    processed: false,
+  });
+
+  toast("تم إنهاء المهمة ✅", "success");
+}

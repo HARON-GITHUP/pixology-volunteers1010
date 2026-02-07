@@ -1,0 +1,6 @@
+// Add this to your Firestore Rules:
+//
+// match /task_events/{id} {
+//   allow create: if signedIn(); // volunteers emit completion events
+//   allow read, update, delete: if isAdmin(); // only admin processes
+// }

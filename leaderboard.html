@@ -1,0 +1,31 @@
+<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>الترتيب | Pixology</title>
+<link rel="stylesheet" href="style.css?v=202602070248"/><meta name="theme-color" content="#0b1620"/>
+<script src="./debug-overlay.js?v=202602070248"></script></head><body>
+<header class="topnav"><div class="container topnav__wrap">
+<a class="brand" href="index.html"><img src="p.jpg" alt="Pixology" style="width:180px;height:80px"/></a>
+<div class="topnav__actions">
+          <a class="link" href="verify.html">✅ تحقق شهادة</a>
+<a class="link" href="index.html">الرئيسية</a>
+<a class="link" href="leaderboard.html">🏆 الترتيب</a>
+<a class="link" href="events.html">📅 الفعاليات</a>
+<a class="link" href="my-profile.html">ملفي</a>
+</div></div></header>
+<main class="container" style="padding:22px 0 70px">
+<section class="card" style="padding:18px;border-radius:18px">
+<h1 style="margin:0 0 6px">🏆 ترتيب المتطوعين</h1>
+<p style="margin:0;color:#64748b;line-height:1.9">ترتيب حسب النقاط (Active/Certified فقط).</p>
+</section>
+<section class="card" style="margin-top:14px;padding:16px;border-radius:18px">
+<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+<div><label style="display:block;font-weight:800;margin-bottom:6px">بحث</label>
+<input id="lbSearch" placeholder="ابحث بالاسم..." style="width:100%;padding:10px;border-radius:12px"/></div>
+<div><label style="display:block;font-weight:800;margin-bottom:6px">عرض</label>
+<select id="lbLimit" style="width:100%;padding:10px;border-radius:12px">
+<option value="25">أفضل 25</option><option value="50">أفضل 50</option><option value="200">أفضل 200</option>
+</select></div></div></section>
+<section class="card" style="margin-top:14px;padding:16px;border-radius:18px">
+<div id="lbList" class="grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px"></div>
+</section></main>
+<script type="module" src="leaderboard.js?v=202602070248"></script></body></html>

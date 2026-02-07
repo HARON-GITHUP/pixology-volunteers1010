@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ملفي الشخصي</title>
-    <link rel="stylesheet" href="style.css?v=202602070121" />
+    <link rel="stylesheet" href="style.css?v=20260207012958" />
     <meta name="theme-color" content="#0b1620" />
   
 <script>
@@ -19,6 +19,8 @@ try{
 }catch(e){}
 </script>
 
+<script src="./polyfills.js?v=20260207012958"></script>
+<script src="./debug-overlay.js?v=20260207012958"></script>
 <script>
 /* ✅ Universal cache/SW fix (runs once per version) */
 (async function() {
@@ -28,7 +30,7 @@ try{
     if (isLocal) return;
 
     const key = "px_swfix_v";
-    const v = "202602070121";
+    const v = "20260207012958";
     if (localStorage.getItem(key) === v) return;
     localStorage.setItem(key, v);
 
@@ -43,6 +45,7 @@ try{
   } catch(e) {}
 })();
 </script>
+
 </head>
 
   <body>
@@ -54,6 +57,10 @@ try{
         </a>
 
         <div class="topnav__actions">
+          <a class="link" href="verify.html">✅ تحقق شهادة</a>
+          <a class="link" href="leaderboard.html">🏆 الترتيب</a>
+          <a class="link" href="events.html">📅 الفعاليات</a>
+          <a class="link" href="dashboard.html">📊 الإحصائيات</a>
           <button id="btnLogout" type="button" style="display: none">
             تسجيل خروج
           </button>
@@ -343,8 +350,24 @@ try{
           <p class="muted">لا يوجد إشعارات</p>
         </div>
       </div>
-    </main>
+    
+    <section class="card" style="margin-top:14px; padding:16px; border-radius:18px">
+      <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px">
+        <div class="card" style="padding:14px; border-radius:16px">
+          <div style="color:#64748b; font-weight:800">⭐ نقاطي</div>
+          <div id="pointsValue" style="font-size:28px; font-weight:950; margin-top:6px">—</div>
+          <div style="color:#64748b; margin-top:6px; line-height:1.8">تزيد تلقائيًا عند إنهاء المهام.</div>
+        </div>
+        <div class="card" style="padding:14px; border-radius:16px">
+          <div style="color:#64748b; font-weight:800">🏆 ترتيبي</div>
+          <div id="rankValue" style="font-size:28px; font-weight:950; margin-top:6px">—</div>
+          <div style="color:#64748b; margin-top:6px; line-height:1.8">حسب إجمالي النقاط بين المتطوعين.</div>
+        </div>
+      </div>
+    </section>
 
-    <script type="module" src="my-profile.js?v=202602070121"></script>
+</main>
+
+    <script type="module" src="my-profile.js?v=20260207012958"></script>
   </body>
 </html>

@@ -1,0 +1,36 @@
+// 🔐 Firestore Rules to reach 99.9%
+// (Add these matches + tighten tasks update)
+//
+// ✅ events
+// match /events/{id} {
+//   allow read: if true;
+//   allow create, update, delete: if isAdmin();
+// }
+//
+// ✅ event_registrations
+// match /event_registrations/{id} {
+//   allow create: if signedIn();
+//   allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+//   allow update, delete: if isAdmin();
+// }
+//
+// ✅ task_submissions
+// match /task_submissions/{id} {
+//   allow create: if signedIn();
+//   allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+//   allow update, delete: if isAdmin();
+// }
+//
+// ✅ tighten tasks (volunteer can’t change points/hours/assignedTo)
+// match /tasks/{id} {
+//   allow create, delete: if isAdmin();
+//   allow read: if signedIn() && resource.data.assignedTo == request.auth.uid;
+//   allow update: if isAdmin()
+//     || (signedIn()
+//       && resource.data.assignedTo == request.auth.uid
+//       && request.resource.data.assignedTo == resource.data.assignedTo
+//       && request.resource.data.points == resource.data.points
+//       && request.resource.data.durationHours == resource.data.durationHours
+//       && request.resource.data.createdBy == resource.data.createdBy
+//     );
+// }

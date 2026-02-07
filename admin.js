@@ -12,6 +12,7 @@ import {
 import {
   collection,
   query,
+  where,
   orderBy,
   onSnapshot,
   serverTimestamp,
@@ -32,6 +33,10 @@ const VOL_COL = "pixology_volunteers";
 const COUNTERS_COL = "counters";
 const NOTI_COL = "notifications";
 const TASKS_COL = "tasks";
+const EVENTS_COL = "events";
+const EVREG_COL = "event_registrations";
+const SUBMISSIONS_COL = "task_submissions";
+const TASK_EVENTS_COL = "task_events";
 const AUDIT_COL = "audit_logs";
 
 
@@ -379,6 +384,7 @@ mAddBtn?.addEventListener("click", async () => {
       gender,
       joinedAt,
       hours: 0,
+      points: 0,
       status: "Active",
       photoData,
       notes,
@@ -860,6 +866,72 @@ function stopListeners() {
   }
 }
 
+
+/** =========================
+ * ✅ Points Engine (Admin-side)
+ * - Volunteers create task_events when completing tasks
+ * - Admin processes events and updates pixology_volunteers points/hours
+========================= */
+async function processTaskEvents(){
+  if (!ADMIN_OK) return;
+  try{
+    const qy = query(collection(db, TASK_EVENTS_COL), where("processed","==",false), orderBy("createdAt","asc"), limit(25));
+    const snap = await getDocs(qy);
+    if (!snap.size) return;
+
+    for (const evDoc of snap.docs){
+      const ev = evDoc.data() || {};
+      const uid = ev.uid || "";
+      const taskId = ev.taskId || "";
+      if (!uid || !taskId){
+        await updateDoc(doc(db, TASK_EVENTS_COL, evDoc.id), { processed:true, processedAt: serverTimestamp(), note:"missing uid/taskId" });
+        continue;
+      }
+
+      // load task
+      const tSnap = await getDoc(doc(db, TASKS_COL, taskId));
+      const task = tSnap.exists() ? (tSnap.data()||{}) : {};
+      const title = task.title || "مهمة";
+      const hours = Number(task.durationHours || 0);
+      const pointsEarned = Number(task.points || task.pointsEarned || hours || 0) || Math.max(1, hours);
+
+      // find volunteer doc by userUid
+      const vQ = query(collection(db, VOL_COL), where("userUid","==",uid), limit(1));
+      const vSnap = await getDocs(vQ);
+      const vDoc = vSnap.docs[0];
+      if (!vDoc){
+        await updateDoc(doc(db, TASK_EVENTS_COL, evDoc.id), { processed:true, processedAt: serverTimestamp(), note:"volunteer not found" });
+        continue;
+      }
+
+      const v = vDoc.data() || {};
+      const newPoints = Number(v.points || 0) + pointsEarned;
+
+      // optionally add hours as well if task has hours credit
+      const newHours = Number(v.hours || 0) + Math.max(0, hours);
+
+      await updateDoc(doc(db, VOL_COL, vDoc.id), {
+        points: newPoints,
+        hours: newHours,
+        updatedAt: serverTimestamp(),
+      });
+
+      await pushNotification(uid, "⭐ نقاط جديدة", `تم إضافة ${pointsEarned} نقطة بسبب إنهاء مهمة: ${title}`, "success");
+
+      await auditLog("points_awarded", { uid, taskId, pointsEarned, hoursAdded: hours });
+
+      await updateDoc(doc(db, TASK_EVENTS_COL, evDoc.id), {
+        processed:true,
+        processedAt: serverTimestamp(),
+        pointsEarned,
+        volunteerDocId: vDoc.id,
+      });
+    }
+  }catch(e){
+    console.log("processTaskEvents", e);
+  }
+}
+
 function startListeners() {
   // Requests
   const reqQ = query(collection(db, REQ_COL), orderBy("createdAt", "desc"));
@@ -955,6 +1027,9 @@ onAuthStateChanged(auth, async (user) => {
   setControlsEnabled(true);
 
   startListeners();
+  // ✅ process points events every 5 seconds
+  setInterval(processTaskEvents, 5000);
+  processTaskEvents();
 });
 
 setControlsEnabled(false);
@@ -971,6 +1046,8 @@ const taskVolunteer = document.getElementById("taskVolunteer");
 const taskTitle = document.getElementById("taskTitle");
 const taskDesc = document.getElementById("taskDesc");
 const taskHours = document.getElementById("taskHours");
+const taskPoints = document.getElementById("taskPoints");
+const taskRequireProof = document.getElementById("taskRequireProof");
 const btnCreateTask = document.getElementById("btnCreateTask");
 const btnRefreshTasks = document.getElementById("btnRefreshTasks");
 const adminTasksList = document.getElementById("adminTasksList");
@@ -1016,10 +1093,12 @@ async function createTaskForVolunteer(){
   const title = taskTitle?.value?.trim();
   const desc = taskDesc?.value?.trim();
   const hours = safeNum(taskHours?.value, 5);
+  const points = safeNum(taskPoints?.value, Math.max(1, hours));
 
   if (!uid) return toast("اختار المتطوع.", "warn");
   if (!title) return toast("اكتب عنوان المهمة.", "warn");
   if (hours < 1) return toast("المدة لازم تكون ساعة أو أكثر.", "warn");
+  if (points < 0) return toast("النقاط لازم تكون 0 أو أكثر.", "warn");
 
   setLoading(true);
   try{
@@ -1029,6 +1108,8 @@ async function createTaskForVolunteer(){
       title,
       description: desc || "",
       durationHours: hours,
+      points: points,
+      requireProof: !!(taskRequireProof && taskRequireProof.checked),
       status: "pending",       // pending -> accepted -> completed/expired
       assignedAt: serverTimestamp(),
       acceptedAt: null,
@@ -1054,6 +1135,8 @@ async function createTaskForVolunteer(){
     taskTitle.value = "";
     taskDesc.value = "";
     taskHours.value = "5";
+    if (taskPoints) taskPoints.value = "10";
+    if (taskRequireProof) taskRequireProof.checked = false;
     await loadRecentTasks();
   }catch(e){
     console.error(e);
@@ -1093,7 +1176,8 @@ async function loadRecentTasks(){
           </div>
           <div style="color:#64748b;margin-top:8px;line-height:1.8">
             للمتطوع: <b>${t.assignedTo || "—"}</b><br/>
-            مدة: <b>${safeNum(t.durationHours,0)}</b> ساعة
+            مدة: <b>${safeNum(t.durationHours,0)}</b> ساعة<br/>
+            نقاط: <b>${safeNum(t.points,0)}</b>
           </div>
           ${t.description ? `<div style="margin-top:8px;line-height:1.8">${t.description}</div>` : ""}
           <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap">
@@ -1131,3 +1215,176 @@ btnRefreshTasks?.addEventListener("click", loadRecentTasks);
 // init (best effort)
 loadVolunteersForTasks();
 loadRecentTasks();
+
+
+const evRegRows = document.getElementById('evRegRows');
+const subRows = document.getElementById('subRows');
+
+async function loadPendingEventRegs(){
+  if (!evRegRows || !ADMIN_OK) return;
+  evRegRows.innerHTML = '<tr><td colspan="4" style="padding:14px;color:#64748b">تحميل...</td></tr>';
+  try{
+    const qy = query(collection(db, EVREG_COL), where("status","==","pending"), orderBy("createdAt","desc"), limit(50));
+    const snap = await getDocs(qy);
+    if (!snap.size){
+      evRegRows.innerHTML = '<tr><td colspan="4" style="padding:14px;color:#64748b">لا يوجد طلبات.</td></tr>';
+      return;
+    }
+    evRegRows.innerHTML = snap.docs.map(d=>{
+      const r = d.data()||{};
+      const t = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleString("ar-EG") : "";
+      return `<tr data-id="${d.id}">
+        <td style="padding:10px">${t}</td>
+        <td style="padding:10px">${r.eventId||""}</td>
+        <td style="padding:10px">${r.uid||""}</td>
+        <td style="padding:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="miniBtn" data-ev-approve="1">اعتماد</button>
+          <button class="miniBtn" data-ev-reject="1">رفض</button>
+        </td>
+      </tr>`;
+    }).join("");
+  }catch(e){
+    console.error(e);
+    evRegRows.innerHTML = '<tr><td colspan="4" style="padding:14px;color:#64748b">تعذر التحميل.</td></tr>';
+  }
+}
+
+evRegRows?.addEventListener("click", async (e)=>{
+  const row = e.target?.closest?.("tr[data-id]");
+  if (!row) return;
+  const id = row.dataset.id;
+  const approve = e.target?.closest?.("[data-ev-approve]");
+  const reject = e.target?.closest?.("[data-ev-reject]");
+  if (!approve && !reject) return;
+
+  try{
+    const regRef = doc(db, EVREG_COL, id);
+    const regSnap = await getDoc(regRef);
+    if (!regSnap.exists()) return;
+    const reg = regSnap.data()||{};
+    const uid = reg.uid || "";
+    const eventId = reg.eventId || "";
+    if (!uid || !eventId) return;
+
+    if (reject){
+      await updateDoc(regRef, { status:"rejected", decidedAt: serverTimestamp(), decidedBy: auth.currentUser?.uid||"" });
+      await pushNotification(uid, "تم رفض الحضور", "تم رفض تسجيل حضور الفعالية.", "warning");
+      loadPendingEventRegs();
+      return;
+    }
+
+    const evSnap = await getDoc(doc(db, EVENTS_COL, eventId));
+    const ev = evSnap.exists() ? (evSnap.data()||{}) : {};
+    const addPoints = Number(ev.points||0);
+    const addHours  = Number(ev.hours||0);
+    const title = ev.title || "فعالية";
+
+    const vQ = query(collection(db, VOL_COL), where("userUid","==",uid), limit(1));
+    const vSnap = await getDocs(vQ);
+    const vDoc = vSnap.docs[0];
+    if (vDoc){
+      const v = vDoc.data()||{};
+      await updateDoc(doc(db, VOL_COL, vDoc.id), {
+        points: Number(v.points||0) + addPoints,
+        hours: Number(v.hours||0) + addHours,
+        updatedAt: serverTimestamp(),
+      });
+    }
+
+    await updateDoc(regRef, { status:"approved", decidedAt: serverTimestamp(), decidedBy: auth.currentUser?.uid||"" });
+    await pushNotification(uid, "✅ تم اعتماد حضورك", `تم اعتماد حضور فعالية: ${title} (+${addHours} ساعة / +${addPoints} نقطة)`, "success");
+    loadPendingEventRegs();
+  }catch(err){
+    console.error(err);
+    toast("❌ خطأ أثناء الاعتماد");
+  }
+});
+
+async function loadPendingSubmissions(){
+  if (!subRows || !ADMIN_OK) return;
+  subRows.innerHTML = '<tr><td colspan="5" style="padding:14px;color:#64748b">تحميل...</td></tr>';
+  try{
+    const qy = query(collection(db, SUBMISSIONS_COL), where("status","==","pending"), orderBy("createdAt","desc"), limit(50));
+    const snap = await getDocs(qy);
+    if (!snap.size){
+      subRows.innerHTML = '<tr><td colspan="5" style="padding:14px;color:#64748b">لا يوجد إثباتات.</td></tr>';
+      return;
+    }
+    subRows.innerHTML = snap.docs.map(d=>{
+      const s = d.data()||{};
+      const t = s.createdAt?.toDate ? s.createdAt.toDate().toLocaleString("ar-EG") : "";
+      const link = s.url ? `<a class="miniBtn" target="_blank" href="${safeAttr(s.url)}" style="text-decoration:none">فتح</a>` : "—";
+      return `<tr data-id="${d.id}">
+        <td style="padding:10px">${t}</td>
+        <td style="padding:10px">${s.taskId||""}</td>
+        <td style="padding:10px">${s.uid||""}</td>
+        <td style="padding:10px">${link}</td>
+        <td style="padding:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="miniBtn" data-sub-approve="1">اعتماد</button>
+          <button class="miniBtn" data-sub-reject="1">رفض</button>
+        </td>
+      </tr>`;
+    }).join("");
+  }catch(e){
+    console.error(e);
+    subRows.innerHTML = '<tr><td colspan="5" style="padding:14px;color:#64748b">تعذر التحميل.</td></tr>';
+  }
+}
+
+subRows?.addEventListener("click", async (e)=>{
+  const row = e.target?.closest?.("tr[data-id]");
+  if (!row) return;
+  const id = row.dataset.id;
+  const approve = e.target?.closest?.("[data-sub-approve]");
+  const reject = e.target?.closest?.("[data-sub-reject]");
+  if (!approve && !reject) return;
+
+  try{
+    const subRef = doc(db, SUBMISSIONS_COL, id);
+    const subSnap = await getDoc(subRef);
+    if (!subSnap.exists()) return;
+    const sub = subSnap.data()||{};
+    const uid = sub.uid || "";
+    const taskId = sub.taskId || "";
+    if (!uid || !taskId) return;
+
+    if (reject){
+      await updateDoc(subRef, { status:"rejected", decidedAt: serverTimestamp(), decidedBy: auth.currentUser?.uid||"" });
+      await pushNotification(uid, "تم رفض الإثبات", "تم رفض إثبات المهمة. يمكنك إعادة الإرسال.", "warning");
+      loadPendingSubmissions();
+      return;
+    }
+
+    // Approve proof. If task requireProof => award now and complete task
+    const tSnap = await getDoc(doc(db,"tasks", taskId));
+    const t = tSnap.exists() ? (tSnap.data()||{}) : {};
+    const requireProof = t.requireProof === true;
+    const title = t.title || "مهمة";
+    const addPoints = Number(t.points||0);
+    const addHours  = Number(t.durationHours||0);
+
+    if (requireProof){
+      const vQ = query(collection(db, VOL_COL), where("userUid","==",uid), limit(1));
+      const vSnap = await getDocs(vQ);
+      const vDoc = vSnap.docs[0];
+      if (vDoc){
+        const v = vDoc.data()||{};
+        await updateDoc(doc(db, VOL_COL, vDoc.id), {
+          points: Number(v.points||0) + addPoints,
+          hours: Number(v.hours||0) + addHours,
+          updatedAt: serverTimestamp(),
+        });
+      }
+      await updateDoc(doc(db,"tasks", taskId), { status:"completed", active:false, completedAt: serverTimestamp(), verifiedAt: serverTimestamp() });
+      await pushNotification(uid, "✅ تم اعتماد المهمة", `تم اعتماد إثبات مهمة: ${title} (+${addHours} ساعة / +${addPoints} نقطة)`, "success");
+    }else{
+      await pushNotification(uid, "✅ تم اعتماد الإثبات", `تم اعتماد إثبات مهمة: ${title}`, "success");
+    }
+
+    await updateDoc(subRef, { status:"approved", decidedAt: serverTimestamp(), decidedBy: auth.currentUser?.uid||"" });
+    loadPendingSubmissions();
+  }catch(err){
+    console.error(err);
+    toast("❌ خطأ أثناء اعتماد الإثبات");
+  }
+});

@@ -1,4 +1,3 @@
-/* DISABLED: Service Worker registration removed to avoid white screen on some devices. */
 // sw.js (Pixology) - Network-first to avoid stale Firebase config / admin panels
 const VERSION = "2026-01-29-v1";
 const CACHE_NAME = `pixology-cache-${VERSION}`;

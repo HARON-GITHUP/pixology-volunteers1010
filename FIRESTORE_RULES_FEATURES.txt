@@ -1,0 +1,14 @@
+// Add to Firestore Rules:
+//
+// match /events/{id} {
+//   allow read: if true;
+//   allow create, update, delete: if isAdmin();
+// }
+//
+// match /event_registrations/{id} {
+//   allow create: if signedIn();
+//   allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+//   allow update, delete: if isAdmin();
+// }
+//
+// (You already added task_events rules + tasks/notifications rules.)

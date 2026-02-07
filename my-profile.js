@@ -941,3 +941,40 @@ async function notifyAdmins(title, message){
     console.log("notifyAdmins err", e);
   }
 }
+
+
+const pointsValue = document.getElementById('pointsValue');
+const rankValue = document.getElementById('rankValue');
+
+
+async function loadPointsAndRank(uid){
+  try{
+    // Find volunteer doc linked to this user
+    const qy = query(collection(db, "pixology_volunteers"), where("userUid","==",uid));
+    const snap = await getDocs(qy);
+    const docSnap = snap.docs[0];
+    const v = docSnap ? (docSnap.data()||{}) : {};
+    const myPoints = Number(v.points || 0);
+    if (pointsValue) pointsValue.textContent = String(myPoints);
+
+    // Rank: compute among Active/Certified volunteers (rules safe via existing filters on public pages; here user is signed in and reading only own doc? Actually rules allow read only Active/Certified on resource, so ranking may fail if user not Active.
+    // We'll best-effort: load top volunteers by points from public list; if denied, show —
+    try{
+      const topQ = query(collection(db,"pixology_volunteers"), where("status","in",["Active","Certified"]), orderBy("points","desc"), limit(200));
+      const topSnap = await getDocs(topQ);
+      let rank = 1;
+      for (const d of topSnap.docs){
+        const data = d.data()||{};
+        if ((data.userUid||"") === uid){ break; }
+        rank++;
+      }
+      if (rankValue) rankValue.textContent = topSnap.size ? ("#" + rank) : "—";
+    }catch(e){
+      if (rankValue) rankValue.textContent = "—";
+    }
+  }catch(e){
+    console.log("loadPointsAndRank", e);
+    if (pointsValue) pointsValue.textContent = "—";
+    if (rankValue) rankValue.textContent = "—";
+  }
+}

@@ -1,0 +1,32 @@
+<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>لوحة الإحصائيات | Pixology</title>
+<link rel="stylesheet" href="style.css?v=202602070248"/><meta name="theme-color" content="#0b1620"/>
+<script src="./debug-overlay.js?v=202602070248"></script>
+</head><body>
+<header class="topnav"><div class="container topnav__wrap">
+<a class="brand" href="index.html"><img src="p.jpg" alt="Pixology" style="width:180px;height:80px"/></a>
+<div class="topnav__actions">
+          <a class="link" href="verify.html">✅ تحقق شهادة</a>
+<a class="link" href="index.html">الرئيسية</a>
+<a class="link" href="leaderboard.html">🏆 الترتيب</a>
+<a class="link" href="events.html">📅 الفعاليات</a>
+<a class="link" href="admin.html">لوحة التحكم</a>
+</div></div></header>
+<main class="container" style="padding:22px 0 70px">
+<section class="card" style="padding:18px;border-radius:18px">
+<h1 style="margin:0 0 6px">📊 لوحة الإحصائيات</h1>
+<p style="margin:0;color:#64748b;line-height:1.9">نظرة سريعة على المتطوعين/الساعات/النقاط/المهام.</p>
+</section>
+<section class="grid" style="margin-top:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+<article class="card" style="padding:14px;border-radius:16px"><div style="color:#64748b;font-weight:800">👥 المتطوعين</div><div id="kpiVol" style="font-size:30px;font-weight:950;margin-top:6px">—</div></article>
+<article class="card" style="padding:14px;border-radius:16px"><div style="color:#64748b;font-weight:800">⭐ مجموع النقاط</div><div id="kpiPoints" style="font-size:30px;font-weight:950;margin-top:6px">—</div></article>
+<article class="card" style="padding:14px;border-radius:16px"><div style="color:#64748b;font-weight:800">⏱️ مجموع الساعات</div><div id="kpiHours" style="font-size:30px;font-weight:950;margin-top:6px">—</div></article>
+<article class="card" style="padding:14px;border-radius:16px"><div style="color:#64748b;font-weight:800">🧩 المهام</div><div id="kpiTasks" style="font-size:30px;font-weight:950;margin-top:6px">—</div></article>
+</section>
+<section class="card" style="margin-top:14px;padding:16px;border-radius:18px">
+<h2 style="margin:0 0 10px">🏆 أفضل 10 متطوعين</h2>
+<div id="topList" class="grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px"></div>
+</section>
+</main>
+<script type="module" src="dashboard.js?v=202602070248"></script></body></html>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>من نحن | مؤسسة بيكسولوجي</title>
-    <link rel="stylesheet" href="style.css?v=202602070121" />
+    <link rel="stylesheet" href="style.css?v=20260207012958" />
     <meta name="theme-color" content="#0b1620" />
   
 <script>
@@ -19,6 +19,8 @@ try{
 }catch(e){}
 </script>
 
+<script src="./polyfills.js?v=20260207012958"></script>
+<script src="./debug-overlay.js?v=20260207012958"></script>
 <script>
 /* ✅ Universal cache/SW fix (runs once per version) */
 (async function() {
@@ -28,7 +30,7 @@ try{
     if (isLocal) return;
 
     const key = "px_swfix_v";
-    const v = "202602070121";
+    const v = "20260207012958";
     if (localStorage.getItem(key) === v) return;
     localStorage.setItem(key, v);
 
@@ -43,6 +45,7 @@ try{
   } catch(e) {}
 })();
 </script>
+
 </head>
 
   <body>
@@ -54,6 +57,10 @@ try{
         </a>
 
         <div class="topnav__actions">
+          <a class="link" href="verify.html">✅ تحقق شهادة</a>
+          <a class="link" href="leaderboard.html">🏆 الترتيب</a>
+          <a class="link" href="events.html">📅 الفعاليات</a>
+          <a class="link" href="dashboard.html">📊 الإحصائيات</a>
           <!-- زر اللغة -->
           <button class="link link--btn" id="langToggle" type="button">
             EN
@@ -203,7 +210,7 @@ try{
       </div>
     </footer>
 
-    <script src="app.js?v=202602070121"></script>
-    <script src="i18n.js?v=202602070121"></script>
+    <script src="app.js?v=20260207012958"></script>
+    <script src="i18n.js?v=20260207012958"></script>
   </body>
 </html>

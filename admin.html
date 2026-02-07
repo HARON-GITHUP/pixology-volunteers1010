@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
   <header class="top">
   <h1>لوحة التحكم (Pixology)</h1>
-  <link rel="stylesheet" href="style.css?v=202602070121" />
+  <link rel="stylesheet" href="style.css?v=20260207012958" />
 
   <div class="actions">
     <input id="search" placeholder="بحث بالاسم أو ID..." />
@@ -174,6 +174,16 @@
             <label style="display:block; font-weight:700; margin:10px 0 6px">المدة (ساعات)</label>
             <input id="taskHours" type="number" min="1" value="5" style="width:100%; padding:10px; border-radius:12px" />
           </div>
+            <div class="field">
+              <label for="taskPoints">⭐ النقاط</label>
+              <input id="taskPoints" type="number" min="0" value="10" placeholder="مثلاً 10" />
+            </div>
+            <div class="field">
+              <label style="display:flex;gap:10px;align-items:center">
+                <input id="taskRequireProof" type="checkbox" />
+                يتطلب إثبات (صورة/PDF)
+              </label>
+            </div>
 
           <div class="card" style="padding:14px; border-radius:16px">
             <label style="display:block; font-weight:700; margin-bottom:6px">وصف المهمة</label>
@@ -193,9 +203,42 @@
         </div>
       </section>
 
+
+      <section class="card" style="margin-top:14px;padding:16px;border-radius:18px">
+        <h2 style="margin:0 0 10px">✅ اعتماد حضور الفعاليات</h2>
+        <div style="color:#64748b;margin-bottom:10px;line-height:1.9">طلبات حضور Pending. اعتمد/ارفض لإضافة النقاط والساعات.</div>
+        <div style="overflow:auto">
+          <table style="width:100%; border-collapse:collapse">
+            <thead><tr>
+              <th style="text-align:right;padding:10px">التاريخ</th>
+              <th style="text-align:right;padding:10px">Event ID</th>
+              <th style="text-align:right;padding:10px">UID</th>
+              <th style="text-align:right;padding:10px">الإجراء</th>
+            </tr></thead>
+            <tbody id="evRegRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:14px;padding:16px;border-radius:18px">
+        <h2 style="margin:0 0 10px">📎 اعتماد إثباتات المهام</h2>
+        <div style="color:#64748b;margin-bottom:10px;line-height:1.9">إثباتات Pending. لو المهمة requireProof ✅، الاعتماد يضيف نقاط/ساعات ويقفل المهمة.</div>
+        <div style="overflow:auto">
+          <table style="width:100%; border-collapse:collapse">
+            <thead><tr>
+              <th style="text-align:right;padding:10px">التاريخ</th>
+              <th style="text-align:right;padding:10px">Task ID</th>
+              <th style="text-align:right;padding:10px">UID</th>
+              <th style="text-align:right;padding:10px">الإثبات</th>
+              <th style="text-align:right;padding:10px">الإجراء</th>
+            </tr></thead>
+            <tbody id="subRows"></tbody>
+          </table>
+        </div>
+      </section>
 </main>
 
-    <script type="module" src="admin.js?v=202602070121"></script>
+    <script type="module" src="admin.js?v=20260207012958"></script>
 
     <div id="toast" class="toast" aria-live="polite"></div>
 
