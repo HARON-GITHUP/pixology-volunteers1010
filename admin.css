@@ -1,0 +1,257 @@
+/* ================== ADMIN STYLE (FULL + MOBILE FIXED) ================== */
+
+body {
+  font-family: Tahoma, Arial;
+  margin: 0;
+  background: #0b1620;
+  color: #eef6ff;
+}
+
+/* ===== TOP BAR ===== */
+.top {
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+/* ===== ACTIONS ===== */
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ===== INPUTS / BUTTONS ===== */
+input,
+select,
+button {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.22);
+  color: #eef6ff;
+}
+
+button {
+  cursor: pointer;
+  font-weight: 900;
+}
+
+/* ===== WRAP ===== */
+.wrap {
+  width: min(1200px, calc(100% - 24px));
+  margin: 18px auto;
+}
+
+/* ===== CARD ===== */
+.card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 16px;
+}
+
+/* ===== TABLE ===== */
+.tableWrap {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1100px;
+}
+
+th,
+td {
+  padding: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: right;
+  vertical-align: top;
+}
+
+th {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ===== TEXT ===== */
+.msg {
+  margin: 10px 0 0;
+  font-weight: 700;
+  color: #ffd3d3;
+}
+
+.hint {
+  opacity: 0.8;
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.muted {
+  opacity: 0.85;
+  font-weight: 800;
+}
+
+/* ===== PANEL ===== */
+.panel {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+/* ===== FORM ROW ===== */
+.formRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+
+.formRow input,
+.formRow select {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  min-width: 180px;
+}
+
+/* ===== MINI CONTROLS ===== */
+.mini {
+  width: 120px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.miniBtn {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+}
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  max-width: min(420px, calc(100% - 36px));
+  background: rgba(15, 23, 42, 0.92);
+  color: #fff;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+  display: none;
+  z-index: 9999;
+  font-weight: 800;
+}
+
+.toast.show {
+  display: block;
+}
+
+.toast small {
+  display: block;
+  opacity: 0.85;
+  margin-top: 4px;
+  font-weight: 700;
+}
+
+/* ===== SUPER ADMIN ===== */
+.superOnly .tableWrap table {
+  min-width: 800px;
+}
+
+/* ================== MOBILE FIX ================== */
+html,
+body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ===== TABLET & MOBILE ===== */
+@media (max-width: 768px) {
+  .wrap {
+    width: calc(100% - 16px);
+    margin: 12px auto;
+  }
+
+  .top {
+    padding: 12px;
+    align-items: stretch;
+  }
+
+  .top > * {
+    width: 100%;
+  }
+
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  input,
+  select,
+  button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .formRow {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .formRow input,
+  .formRow select {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .mini,
+  .miniBtn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  th,
+  td {
+    font-size: 14px;
+  }
+}
+
+/* ===== SMALL PHONES ===== */
+@media (max-width: 480px) {
+  .card {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  th,
+  td {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .hint {
+    font-size: 12px;
+  }
+}

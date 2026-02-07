@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>مهامي | Pixology</title>
+    <link rel="stylesheet" href="style.css" />
+    <meta name="theme-color" content="#0b1620" />
+    <script>
+      /* ✅ Fix: Firebase Authorized Domain issue */
+      try{
+        if (location.hostname === "127.0.0.1") {
+          const u = new URL(location.href);
+          u.hostname = "localhost";
+          location.replace(u.toString());
+        }
+      }catch(e){}
+    </script>
+  </head>
+  <body>
+    <header class="topnav">
+      <div class="container topnav__wrap">
+        <a class="brand" href="index.html">
+          <img src="p.jpg" alt="Pixology" style="width: 180px; height: 80px" />
+        </a>
+
+        <div class="topnav__actions">
+          <a class="link" href="index.html">الرئيسية</a>
+          <a class="link" href="my-profile.html">ملفي الشخصي</a>
+          <a class="link" href="tasks.html">🧩 مهامي</a>
+          <a class="link" href="certificates.html">📜 الشهادات</a>
+          <a class="btn btn--solid" href="register.html">تقديم طلب تطوع</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="container" style="padding: 22px 0 70px">
+      <section class="card" style="padding: 18px; border-radius: 18px">
+        <h1 style="margin:0 0 6px">🧩 مهامي</h1>
+        <p style="margin:0; color:#64748b; line-height:1.9">
+          هنا تقدر تتابع كل المهام، وتفلتر حسب الحالة، وتبدأ المهمة (موافقة) عشان العداد يشتغل.
+        </p>
+      </section>
+
+      <section class="card" style="margin-top: 14px; padding: 16px; border-radius: 18px">
+        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px">
+          <div>
+            <label style="display:block; font-weight:800; margin-bottom:6px">فلترة الحالة</label>
+            <select id="taskFilter" style="width:100%; padding:10px; border-radius:12px">
+              <option value="">الكل</option>
+              <option value="pending">⏳ معلّقة</option>
+              <option value="accepted">✅ جارية</option>
+              <option value="completed">🏁 مكتملة</option>
+              <option value="expired">⛔ منتهية</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block; font-weight:800; margin-bottom:6px">بحث</label>
+            <input id="taskSearch" placeholder="ابحث بعنوان المهمة..." style="width:100%; padding:10px; border-radius:12px" />
+          </div>
+          <div style="display:flex; gap:10px; align-items:end">
+            <button class="btn btn--solid" id="btnRefreshTasks" type="button" style="width:100%">تحديث</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top: 14px; padding: 16px; border-radius: 18px">
+        <div id="tasksList" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px"></div>
+      </section>
+    </main>
+
+    <script type="module" src="tasks.js"></script>
+  </body>
+</html>

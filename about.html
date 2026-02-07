@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>من نحن | مؤسسة بيكسولوجي</title>
+    <link rel="stylesheet" href="style.css" />
+    <meta name="theme-color" content="#0b1620" />
+  
+<script>
+/* ✅ Fix: Firebase Authorized Domain issue
+   افتح المشروع على localhost بدل 127.0.0.1 */
+try{
+  if (location.hostname === "127.0.0.1") {
+    const u = new URL(location.href);
+    u.hostname = "localhost";
+    location.replace(u.toString());
+  }
+}catch(e){}
+</script>
+
+</head>
+
+  <body>
+    <!-- TOP NAV -->
+    <header class="topnav">
+      <div class="container topnav__wrap">
+        <a class="brand" href="index.html">
+          <img src="p.jpg" alt="Pixology" style="width: 180px; height: 80px" />
+        </a>
+
+        <div class="topnav__actions">
+          <!-- زر اللغة -->
+          <button class="link link--btn" id="langToggle" type="button">
+            EN
+          </button>
+
+          <a class="link" href="index.html" data-i18n="navHome">الرئيسية</a>
+          <a class="link active" href="about.html" data-i18n="navAbout">
+            من نحن
+          </a>
+          <a class="link" href="admin.html" data-i18n="navAdmin">لوحة التحكم</a>
+          <a class="link" href="tasks.html">🧩 مهامي</a>
+                <a class="link" href="certificates.html" data-i18n="navCerts">
+            📜 كل الشهادات
+          </a>
+          <a class="btn btn--solid" href="register.html" data-i18n="navApply">
+            تقديم طلب تطوع
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- PAGE HEADER -->
+    <section class="page-hero">
+      <div class="container page-hero__wrap">
+        <h1 data-i18n="aboutPageTitle">من نحن</h1>
+        <p data-i18n="aboutPageSub">
+          مؤسسة بيكسولوجي للسلام والتنمية وحقوق الإنسان
+        </p>
+      </div>
+    </section>
+
+    <!-- ABOUT CONTENT -->
+    <main class="container about-page">
+      <!-- VIDEO -->
+      <div class="about-video">
+        <div class="video-frame">
+          <iframe
+            src="https://drive.google.com/file/d/1qdZhXZhGeM28EHB_kOFhr9dolFUvh2CW/preview"
+            allow="autoplay"
+            loading="lazy"
+            title="Pixology Video"
+          >
+          </iframe>
+        </div>
+
+        <p class="video-note" data-i18n="videoNote">
+          فيديو تعريفي عن مؤسسة بيكسولوجي للسلام والتنمية وحقوق الإنسان
+        </p>
+      </div>
+
+      <!-- TEXT -->
+      <section class="about-text">
+        <h2>
+          <span data-i18n="aboutNameAr">
+            مؤسسة بيكسولوجي للسلام والتنمية وحقوق الإنسان
+          </span>
+          <span data-i18n="aboutNameEn">
+            Pixology Foundation for Peace, Development & Human Rights
+          </span>
+        </h2>
+
+        <p data-i18n="aboutP1">
+          مؤسسة بيكسولوجي للسلام والتنمية وحقوق الإنسان هي مؤسسة غير ربحية تعمل
+          في مجال السلام والتنمية المستدامة وحقوق الإنسان، وتهدف إلى دعم وتمكين
+          الأفراد والمجتمعات الأكثر احتياجًا من خلال برامج إنسانية وتنموية
+          متكاملة قائمة على مبادئ العدالة الاجتماعية والكرامة الإنسانية.
+        </p>
+
+        <p data-i18n="aboutP2">
+          تسعى المؤسسة إلى إحداث تأثير إيجابي ومستدام عبر تعزيز ثقافة السلام،
+          ودعم الفئات المهمشة، وتقديم حلول عملية للتحديات الاجتماعية والنفسية
+          والاقتصادية، إيمانًا بدور العمل المجتمعي في بناء مستقبل أكثر عدلًا
+          وأمانًا.
+        </p>
+
+        <hr />
+
+        <h3 data-i18n="vision">رؤيتنا</h3>
+        <p data-i18n="visionP">
+          بناء مجتمعات آمنة وعادلة يتمتع فيها الإنسان بحقوقه الأساسية، وتُتاح له
+          فرص متكافئة للتنمية والنمو في بيئة يسودها السلام والاحترام المتبادل.
+        </p>
+
+        <h3 data-i18n="mission">رسالتنا</h3>
+        <p data-i18n="missionP">
+          العمل على تعزيز السلام والتنمية وحقوق الإنسان من خلال تنفيذ برامج
+          إنسانية وتنموية شاملة، وبناء قدرات الأفراد والمجتمعات، ودعم الفئات
+          الأكثر ضعفًا، بالتعاون مع الشركاء المحليين والدوليين.
+        </p>
+
+        <h3 data-i18n="areas">مجالات عملنا</h3>
+        <ul>
+          <li data-i18n="area1">تعزيز السلام ونبذ العنف</li>
+          <li data-i18n="area2">حقوق الإنسان والدفاع عن الفئات المهمشة</li>
+          <li data-i18n="area3">التنمية المجتمعية والتمكين الاقتصادي</li>
+          <li data-i18n="area4">الدعم النفسي والاجتماعي</li>
+          <li data-i18n="area5">تمكين النساء والشباب</li>
+          <li data-i18n="area6">دعم الأطفال وذوي الإعاقة</li>
+          <li data-i18n="area7">التوعية وبناء القدرات</li>
+        </ul>
+
+        <h3 data-i18n="values">قيمنا</h3>
+        <ul>
+          <li data-i18n="value1">الإنسانية</li>
+          <li data-i18n="value2">الشفافية</li>
+          <li data-i18n="value3">العدالة</li>
+          <li data-i18n="value4">المساواة</li>
+          <li data-i18n="value5">المسؤولية المجتمعية</li>
+          <li data-i18n="value6">الاستدامة</li>
+        </ul>
+
+        <h3 data-i18n="scope">نطاق عملنا</h3>
+        <p data-i18n="scopeP">
+          يقع المقر الرئيسي للمؤسسة في الولايات المتحدة الأمريكية – ولاية
+          كونيتيكت، وتمتد أنشطتها وبرامجها إلى المستوى الإقليمي والدولي، مع
+          تركيز خاص على منطقة الشرق الأوسط وشمال إفريقيا.
+        </p>
+        <hr />
+
+        <h3 data-i18n="mapTitle">خريطة المقر</h3>
+
+        <div class="map-frame">
+          <iframe
+            src="https://www.google.com/maps?q=Connecticut%2C%20USA&output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen
+            title="Pixology HQ Map"
+          >
+          </iframe>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="container footer__wrap">
+        <div class="footer__center">
+          <img src="p.jpg" alt="Pixology" loading="lazy" />
+          <p class="footer__note" data-i18n="footerNote">
+            تم إنشاء هذه المنصة لتوثيق المتطوعين وإبراز إنجازاتهم بشكل رسمي.
+          </p>
+          <a href="mailto:info@pixologyfoundation.org">
+            info@pixologyfoundation.org
+          </a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+    <script src="i18n.js"></script>
+  </body>
+</html>

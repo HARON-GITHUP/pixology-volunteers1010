@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>الإنجازات | Pixology</title>
+    <link rel="stylesheet" href="style.css" />
+    <meta name="theme-color" content="#0b1620" />
+    <script>
+      /* ✅ Fix: Firebase Authorized Domain issue */
+      try{
+        if (location.hostname === "127.0.0.1") {
+          const u = new URL(location.href);
+          u.hostname = "localhost";
+          location.replace(u.toString());
+        }
+      }catch(e){}
+    </script>
+  </head>
+
+  <body>
+    <header class="topnav">
+      <div class="container topnav__wrap">
+        <a class="brand" href="index.html">
+          <img src="p.jpg" alt="Pixology" style="width: 180px; height: 80px" />
+        </a>
+
+        <div class="topnav__actions">
+          <a class="link" href="index.html">الرئيسية</a>
+          <a class="link" href="about.html">من نحن</a>
+          <a class="link" href="certificates.html">📜 الشهادات</a>
+          <a class="link" href="achievements.html">🏆 الإنجازات</a>
+          <a class="btn btn--solid" href="register.html">تقديم طلب تطوع</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="container" style="padding: 28px 0 60px">
+      <section class="card" style="padding: 22px; border-radius: 18px">
+        <h1 style="margin: 0 0 8px">🏆 إنجازات Pixology</h1>
+        <p style="margin: 0; color: #64748b; line-height: 1.9">
+          هنا بنعرض أرقام سريعة + آخر إنجازات المتطوعين (متحدثة تلقائيًا من قاعدة البيانات).
+        </p>
+      </section>
+
+      <section class="grid" style="margin-top: 16px">
+        <article class="card" style="padding: 18px; border-radius: 18px">
+          <h3 style="margin: 0 0 6px">👥 عدد المتطوعين</h3>
+          <div id="statVol" style="font-size: 30px; font-weight: 800">—</div>
+        </article>
+        <article class="card" style="padding: 18px; border-radius: 18px">
+          <h3 style="margin: 0 0 6px">📝 عدد الطلبات</h3>
+          <div id="statReq" style="font-size: 30px; font-weight: 800">—</div>
+        </article>
+        <article class="card" style="padding: 18px; border-radius: 18px">
+          <h3 style="margin: 0 0 6px">⏱️ إجمالي الساعات</h3>
+          <div id="statHours" style="font-size: 30px; font-weight: 800">—</div>
+        </article>
+      </section>
+
+      <section class="card" style="margin-top: 16px; padding: 18px; border-radius: 18px">
+        <h2 style="margin: 0 0 10px">آخر المتطوعين النشطين</h2>
+        <div id="topList" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr))"></div>
+      </section>
+
+      <section class="card" style="margin-top: 16px; padding: 18px; border-radius: 18px">
+        <h2 style="margin: 0 0 10px">معرض إنجازات (صور)</h2>
+        <p style="margin: 0 0 12px; color:#64748b; line-height:1.8">
+          ضع صور الفعاليات هنا لاحقًا (سنربطها بـ Firebase Storage في المرحلة القادمة).
+        </p>
+        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px">
+          <div class="card" style="height:140px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:#94a3b8">صورة 1</div>
+          <div class="card" style="height:140px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:#94a3b8">صورة 2</div>
+          <div class="card" style="height:140px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:#94a3b8">صورة 3</div>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="achievements.js"></script>
+  </body>
+</html>

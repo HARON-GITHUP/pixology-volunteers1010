@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>تقديم طلب تطوع | Pixology</title>
+    <link rel="stylesheet" href="register.css" />
+    <meta name="theme-color" content="#0b1620" />
+  
+<script>
+/* ✅ Fix: Firebase Authorized Domain issue
+   افتح المشروع على localhost بدل 127.0.0.1 */
+try{
+  if (location.hostname === "127.0.0.1") {
+    const u = new URL(location.href);
+    u.hostname = "localhost";
+    location.replace(u.toString());
+  }
+}catch(e){}
+</script>
+
+</head>
+
+  <body>
+    <div class="bg" aria-hidden="true">
+      <span class="blob blob--1"></span>
+      <span class="blob blob--2"></span>
+      <span class="grid"></span>
+    </div>
+
+    <header class="top">
+      <div class="container top__wrap">
+        <a class="brand" href="index.html">
+          <span class="logo">P</span>
+          <span class="brand__text">Pixology</span>
+        </a>
+
+        <nav class="nav">
+          <button class="link link--btn" id="langToggle" type="button">
+            EN
+          </button>
+          <script src="i18n.js"></script>
+          <button id="btnLogout" type="button">تسجيل خروج</button>
+
+          <a class="nav__link" href="index.html">الرئيسية</a>
+          <a class="nav__link" href="admin.html">لوحة التحكم</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <div class="card__head">
+          <h1>تقديم طلب تطوع</h1>
+          <p class="muted">
+            املأ البيانات بدقة — سيتم مراجعة الطلب من الأدمن، وبعد الموافقة سيتم
+            إصدار Volunteer ID رسمي.
+          </p>
+        </div>
+
+        <form id="regForm" class="form" novalidate>
+          <div class="row">
+            <label class="field">
+              <span>اسم المتطوع *</span>
+              <input
+                id="name"
+                type="text"
+                placeholder="مثال: هارون محمد"
+                required
+              />
+            </label>
+
+            <label class="field">
+              <span>رقم الهاتف *</span>
+              <input
+                id="phone"
+                type="tel"
+                placeholder="مثال: +201000000000"
+                required
+              />
+            </label>
+          </div>
+
+          <div class="row">
+            <label class="field">
+              <span>الجنس *</span>
+              <select id="gender" required>
+                <option value="">اختر</option>
+                <option value="ذكر">ذكر</option>
+                <option value="انثى">انثى</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>تاريخ الانضمام *</span>
+              <input id="joinedAt" type="date" required />
+            </label>
+          </div>
+
+          <div class="row">
+            <label class="field">
+              <label class="field">
+                <span>صورة المتطوع (اجباري)</span>
+                <input id="photoFile" type="file" accept="image/*" />
+
+                <small class="muted">اختر صورة من المعرض (JPG/PNG)</small>
+              </label>
+            </label>
+
+            <label class="field">
+              <span>البلد (اختياري)</span>
+              <input id="country" type="text" placeholder="مثال: مصر" />
+            </label>
+          </div>
+
+          <label class="field field--full">
+            <span>سبب التطوع / ملاحظات (اختياري)</span>
+            <textarea
+              id="notes"
+              rows="4"
+              placeholder="اكتب سبب التطوع أو أي تفاصيل إضافية..."
+            ></textarea>
+          </label>
+
+          <div class="actions">
+            <button id="submitBtn" class="btn btn--solid" type="submit">
+              إرسال الطلب
+            </button>
+            <button class="btn btn--outline" type="reset">مسح</button>
+          </div>
+
+          <p id="msg" class="msg" aria-live="polite"></p>
+
+          <!-- ✅ كارت نجاح -->
+          <div id="successCard" class="success" style="display: none">
+            <h3 class="success__title">✅ تم إرسال الطلب!</h3>
+            <p class="muted" style="margin: 0 0 12px">
+              طلبك في انتظار موافقة الأدمن، وبعدها هيتم إصدار Volunteer ID رسمي.
+            </p>
+
+            <div class="success__grid">
+              <div><b>الاسم:</b> <span id="scName">—</span></div>
+              <div><b>الموبايل:</b> <span id="scPhone">—</span></div>
+              <div><b>الحالة:</b> Pending</div>
+            </div>
+
+            <div class="actions" style="margin-top: 12px">
+              <a class="btn btn--solid" href="index.html">رجوع للرئيسية</a>
+              <a class="btn btn--outline" href="admin.html">لوحة الأدمن</a>
+            </div>
+          </div>
+        </form>
+
+        <div class="noteBox">
+          <b>ملحوظة:</b>
+          <span class="muted"
+            >يتم حفظ الطلبات في Collection:
+            <code>volunteer_requests</code></span
+          >
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="register.js"></script>
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("./sw.js").catch(console.error);
+        });
+      }
+    </script>
+  </body>
+</html>

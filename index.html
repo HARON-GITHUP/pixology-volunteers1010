@@ -1,0 +1,335 @@
+<!--
+⚠️ تنبيه مهم:
+هذه الصفحات تعمل بشكل صحيح عند تشغيلها عبر Local Server (وليس file://)
+مثال: Live Server في VS Code أو python -m http.server
+
+ممنوع تمسح الملف ده ❌ لأنه الصفحة الرئيسية للمشروع.
+-->
+
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>مؤسسة بيكسولوجي</title>
+    <link rel="stylesheet" href="style.css" />
+    <meta name="theme-color" content="#0b1620" />
+
+    <style id="local-server-hint-style">
+      .localHint {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.72);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        z-index: 99999;
+        font-family:
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Arial,
+          sans-serif;
+      }
+      .localHint__card {
+        width: min(720px, 96vw);
+        background: #fff;
+        border-radius: 18px;
+        padding: 18px 18px 14px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+        direction: rtl;
+        text-align: right;
+      }
+      .localHint__title {
+        margin: 0 0 8px;
+        font-size: 20px;
+        line-height: 1.4;
+      }
+      .localHint__p {
+        margin: 0 0 10px;
+        color: #334155;
+        line-height: 1.8;
+        font-size: 15px;
+      }
+      .localHint__code {
+        background: #0b1220;
+        color: #e2e8f0;
+        border-radius: 12px;
+        padding: 12px;
+        overflow: auto;
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
+          monospace;
+        font-size: 13px;
+        direction: ltr;
+        text-align: left;
+      }
+      .localHint__row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+      .localHint__btn {
+        border: 0;
+        padding: 10px 12px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+      }
+      .localHint__btn--primary {
+        background: #f4c542;
+      }
+      .localHint__btn--ghost {
+        background: #e2e8f0;
+      }
+      .localHint__small {
+        margin-top: 10px;
+        font-size: 13px;
+        color: #64748b;
+      }
+    </style>
+  
+<script>
+/* ✅ Fix: Firebase Authorized Domain issue
+   افتح المشروع على localhost بدل 127.0.0.1 */
+try{
+  if (location.hostname === "127.0.0.1") {
+    const u = new URL(location.href);
+    u.hostname = "localhost";
+    location.replace(u.toString());
+  }
+}catch(e){}
+</script>
+
+</head>
+
+  <body>
+    <!-- ===== START GATE SCREEN ===== -->
+    <div id="startGate" class="gate">
+      <div class="gate__card">
+        <img src="p.jpg" alt="Pixology" class="gate__logo" />
+
+        <h1 class="gate__title">مرحبًا بك في Pixology</h1>
+        <p class="gate__subtitle">اختر نوع الحساب للمتابعة</p>
+
+        <div class="gate__options">
+          <!-- شخصي
+      <div class="gate__option">
+        <div class="gate__icon">👤</div>
+        <h3>شخصي</h3>
+        <p>متطوع – تطوير مهارات – مشاركة مجتمعية</p>
+        <button class="btn btn--solid" data-type="personal">
+          متابعة كـ متطوع
+        </button>
+        <button class="btn btn--solid" data-type="volunteer">تسجيل كـ متطوع</button>
+<button class="btn btn--outline" data-type="org">تسجيل كـ مؤسسة</button>
+
+
+      </div>
+
+      
+<!-- ===== END GATE SCREEN =====
+
+    <!-- TOP NAV -->
+          <header class="topnav">
+            <div class="container topnav__wrap">
+              <a class="brand" href="index.html">
+                <img
+                  src="p.jpg"
+                  alt="Pixology"
+                  style="width: 180px; height: 80px"
+                />
+              </a>
+
+              <div class="topnav__actions" style="position: relative">
+                <!-- ✅ زر تغيير اللغة -->
+                <button class="link link--btn" id="langToggle" type="button">
+                  EN
+                </button>
+
+                <!-- ✅ زر تسجيل/حساب -->
+                <button id="btnLogin" class="link link--btn" type="button">
+                  تسجيل / إنشاء حساب
+                </button>
+
+                <div id="loginMenu" class="login-menu" style="display: none">
+                  <button id="loginGoogle" class="login-btn" type="button">
+                    التسجيل باستخدام Google
+                  </button>
+                </div>
+
+                <!-- ✅ زر تسجيل خروج (مخفي افتراضيًا) -->
+                <button
+                  id="btnLogout"
+                  class="link link--btn"
+                  type="button"
+                  style="display: none"
+                >
+                  تسجيل خروج
+                </button>
+                <a
+                  class="link"
+                  href="my-profile.html"
+                  id="myProfileLink"
+                  style="display: none"
+                >
+                  ملفي الشخصي
+                </a>
+
+                <!-- ✅ قائمة اختيار طريقة التسجيل (هتفتح بعد الصورة) -->
+                <div id="loginMenu" class="login-menu" style="display: none">
+                  <button id="loginGoogle" class="login-btn" type="button">
+                    التسجيل باستخدام Google
+                  </button>
+                  <!-- تقدر تزود هنا Providers تانية بعدين -->
+                </div>
+
+                <a class="link" href="contact.html" data-i18n="navContact"
+                  >راسلنا</a
+                >
+                <a class="link" href="about.html" data-i18n="navAbout"
+                  >من نحن</a
+                >
+                <a class="link" href="admin.html" data-i18n="navAdmin"
+                  >لوحة التحكم</a
+                >
+                <a class="link" href="tasks.html">🧩 مهامي</a>
+                <a class="link" href="certificates.html" data-i18n="navCerts">📜 كل الشهادات</a>
+                <a class="link" href="achievements.html">🏆 الإنجازات</a>
+
+                <!-- ✅ تقديم طلب تطوع زي الأول -->
+                <a
+                  class="btn btn--solid"
+                  href="register.html"
+                  data-i18n="navApply"
+                >
+                  تقديم طلب تطوع
+                </a>
+              </div>
+            </div>
+          </header>
+
+          <!-- HERO -->
+          <section class="hero">
+            <div class="hero__bg"></div>
+            <div class="hero__pattern" aria-hidden="true"></div>
+
+            <div class="course-card__img hero-img">
+              <div class="hero-text">
+                <span class="badge-count">
+                  <span data-i18n="reqLabel">الطلبات</span>
+                  <b id="reqCount">—</b>
+                </span>
+                <span class="badge-type">
+                  <span data-i18n="volLabel">المتطوعين</span>
+                  <b id="volCount">—</b>
+                </span>
+
+                <h2 data-i18n="brandTitle">Pixology Foundation</h2>
+                <p data-i18n="brandSub">مؤسسة بيكسولوجي للسلام والتنمية</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECTION TITLE -->
+          <section class="section-title">
+            <div class="container section-title__wrap">
+              <h2 class="section-title__h">
+                <span data-i18n="secVolTitle">المتطوعين</span>
+                <span data-i18n="secVolTitleSpan">المعتمدين</span>
+              </h2>
+              <div class="section-title__lines" aria-hidden="true">
+                <span></span><span></span>
+              </div>
+            </div>
+          </section>
+
+          <!-- FILTER TOOLS -->
+          <section class="tools container">
+            <div class="tools__row">
+              <input
+                id="courseSearch"
+                class="tools__input"
+                type="text"
+                placeholder="ابحث عن متطوع..."
+                data-i18n-placeholder="searchPh"
+              />
+
+              <select id="filterGender" class="tools__select">
+                <option value="" data-i18n-option="genderPh">الجنس</option>
+                <option value="ذكر" data-i18n-option="male">ذكر</option>
+                <option value="انثى" data-i18n-option="female">انثى</option>
+              </select>
+
+              <select id="filterGrade" class="tools__select">
+                <option value="" data-i18n-option="sortPh">الترتيب</option>
+                <option value="اكبر عدد ساعات" data-i18n-option="sortHigh">
+                  أكبر عدد ساعات
+                </option>
+                <option value="اقل عدد ساعات" data-i18n-option="sortLow">
+                  أقل عدد ساعات
+                </option>
+              </select>
+
+              <button
+                id="clearFilters"
+                class="btn btn--outline"
+                type="button"
+                data-i18n="clear"
+              >
+                مسح
+              </button>
+            </div>
+
+            <div class="tools__meta" id="resultWrap">
+              <span id="resultCount">0</span>
+              <span data-i18n="volunteersWord">متطوع</span>
+            </div>
+          </section>
+
+          <!-- VOLUNTEERS GRID (Dynamic) -->
+          <main class="container">
+            <section
+              class="grid"
+              id="volGrid"
+              aria-label="قائمة المتطوعين المعتمدين"
+            ></section>
+          </main>
+
+          <!-- FOOTER -->
+          <footer class="footer">
+            <div class="container footer__wrap">
+              <div class="footer__center">
+                <img
+                  src="p.jpg"
+                  alt="Pixology"
+                  loading="lazy"
+                  decoding="async"
+                  onerror="this.src = 'p.jpg'"
+                />
+
+                <p class="footer__note" data-i18n="footerNote">
+                  تم إنشاء هذه المنصة لتوثيق المتطوعين وإبراز إنجازاتهم بشكل
+                  رسمي.
+                </p>
+
+                <a href="mailto:info@pixologyfoundation.org"
+                  >info@pixologyfoundation.org</a
+                >
+              </div>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ لغة الموقع -->
+    <script src="i18n.js"></script>
+
+    <!-- ✅ JS الصفحة (Firebase لازم Module) -->
+    <script type="module" src="index.js"></script>
+  </body>
+</html>

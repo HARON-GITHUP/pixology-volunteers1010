@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Super Admin | Pixology</title>
+
+    <link rel="stylesheet" href="super.css" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="theme-color" content="#0b1620" />
+  
+<script>
+/* ✅ Fix: Firebase Authorized Domain issue
+   افتح المشروع على localhost بدل 127.0.0.1 */
+try{
+  if (location.hostname === "127.0.0.1") {
+    const u = new URL(location.href);
+    u.hostname = "localhost";
+    location.replace(u.toString());
+  }
+}catch(e){}
+</script>
+
+</head>
+
+  <body>
+    <header class="top">
+      <h1>لوحة السوبر أدمن (Pixology)</h1>
+
+      <div class="actions">
+        <a href="admin.html" class="btn btn--outline">رجوع للأدمن</a>
+        <button id="logout" class="btn btn--solid" type="button">
+          تسجيل خروج
+        </button>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section class="card" id="adminManager" style="margin-top: 14px">
+        <h2>إدارة الأدمنز (Super Admin)</h2>
+
+        <div class="hint">
+          * هنا تقدر تضيف/تعطل/تغير صلاحيات الأدمنز عن طريق UID
+        </div>
+
+        <div class="formRow">
+          <input id="aUid" placeholder="UID (من Authentication)" />
+          <select id="aRole">
+            <option value="admin">admin</option>
+            <option value="super_admin">super_admin</option>
+          </select>
+
+          <select id="aActive">
+            <option value="true">active: true</option>
+            <option value="false">active: false</option>
+          </select>
+
+          <button id="aSave" class="btn btn--solid" type="button">
+            💾 حفظ/تحديث
+          </button>
+        </div>
+
+        <div class="formRow">
+          <button id="aLoad" class="btn btn--outline" type="button">
+            🔄 تحميل قائمة الأدمنز
+          </button>
+          <small class="muted" id="aMsg"></small>
+        </div>
+        <section class="card" style="margin-top: 14px">
+          <h2 style="margin: 0 0 10px">➕ إضافة أدمن جديد</h2>
+
+          <div
+            style="
+              display: flex;
+              gap: 10px;
+              flex-wrap: wrap;
+              align-items: center;
+            "
+          >
+            <input
+              id="aUid"
+              placeholder="اكتب UID هنا"
+              style="min-width: 260px"
+            />
+
+            <select id="aRole">
+              <option value="admin">admin</option>
+              <option value="super_admin">super_admin</option>
+            </select>
+
+            <select id="aActive">
+              <option value="true">مفعل</option>
+              <option value="false">غير مفعل</option>
+            </select>
+
+            <button id="aSave" class="btn btn--solid" type="button">حفظ</button>
+            <button id="aLoad" class="btn btn--outline" type="button">
+              تحديث القائمة
+            </button>
+          </div>
+
+          <p id="aMsg" class="muted" style="margin: 10px 0 0">
+            💡 للحصول على UID: افتح Firebase → Authentication → Users → انسخ UID
+          </p>
+        </section>
+
+        <section class="card" style="margin-top: 14px">
+          <h2 style="margin: 0 0 10px">قائمة الأدمنز</h2>
+          <table style="width: 100%; border-collapse: collapse">
+            <thead>
+              <tr>
+                <th style="text-align: right; padding: 10px">UID</th>
+                <th style="text-align: right; padding: 10px">Role</th>
+                <th style="text-align: right; padding: 10px">Active</th>
+                <th style="text-align: right; padding: 10px">تحكم</th>
+              </tr>
+            </thead>
+            <tbody id="aRows"></tbody>
+          </table>
+        </section>
+
+        <div class="tableWrap" style="margin-top: 10px">
+          <table style="min-width: 800px">
+            <thead>
+              <tr>
+                <th>UID</th>
+                <th>Role</th>
+                <th>Active</th>
+                <th>إجراء سريع</th>
+              </tr>
+            </thead>
+            <tbody id="aRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" aria-live="polite"></div>
+
+    <!-- مهم: خليه قبل super.js لو firebase.js بيجهز app/auth/db -->
+    <script type="module" src="super.js"></script>
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("./sw.js").catch(console.error);
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+// FIRESTORE RULES (suggested additions)
+// Collections added:
+// - volunteer_tasks
+// - notifications
+//
+// IMPORTANT: adjust to your existing rules structure.
+// Goal:
+// - Admin can create tasks + notifications for any user
+// - Volunteer can read their own tasks/notifications
+// - Volunteer can accept/complete ONLY their own tasks
+//
+// Example logic (pseudo):
+// match /volunteer_tasks/{id} {
+//   allow create: if isAdmin();
+//   allow read: if isAdmin() || (signedIn() && request.auth.uid == resource.data.uid);
+//   allow update: if isAdmin() || (signedIn() && request.auth.uid == resource.data.uid);
+// }
+//
+// match /notifications/{id} {
+//   allow create: if isAdmin() || (signedIn() && request.auth.uid == request.resource.data.uid);
+//   allow read, update, delete: if isAdmin() || (signedIn() && request.auth.uid == resource.data.uid);
+// }

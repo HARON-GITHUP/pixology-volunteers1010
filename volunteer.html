@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ملف المتطوع</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .v-wrap {
+        padding: 18px 0 70px;
+      }
+      .v-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+      .v-head {
+        padding: 16px;
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .v-avatar {
+        width: 70px;
+        height: 70px;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        overflow: hidden;
+        background: rgba(25, 168, 230, 0.08);
+        display: grid;
+        place-items: center;
+        font-weight: 1100;
+      }
+      .v-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .v-info {
+        display: grid;
+        gap: 4px;
+      }
+      .v-name {
+        margin: 0;
+        font-weight: 1100;
+        font-size: 22px;
+      }
+      .v-id {
+        color: var(--muted);
+        font-weight: 900;
+      }
+      .v-badges {
+        margin-inline-start: auto;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .v-badges .pill {
+        box-shadow: none;
+        border: 1px solid var(--border);
+      }
+      .v-body {
+        padding: 16px;
+        border-top: 1px solid var(--border);
+      }
+
+      .chart-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        align-items: stretch;
+      }
+      @media (max-width: 980px) {
+        .chart-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .panel {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 14px;
+        box-shadow: var(--shadow);
+      }
+      .panel h3 {
+        margin: 0 0 10px;
+        font-size: 18px;
+        font-weight: 1100;
+      }
+      .muted {
+        color: var(--muted);
+        font-weight: 900;
+      }
+      .big-number {
+        font-size: 38px;
+        font-weight: 1100;
+        margin: 6px 0 0;
+      }
+
+      canvas {
+        width: 100%;
+        height: 260px;
+        display: block;
+      }
+      .row-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+
+      .qrBox {
+        margin-top: 14px;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        display: grid;
+        gap: 10px;
+        place-items: center;
+        background: rgba(15, 23, 42, 0.03);
+      }
+      #qrcode {
+        display: flex;
+        justify-content: center;
+      }
+      .errorBox {
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: rgba(220, 38, 38, 0.08);
+        color: #b91c1c;
+        font-weight: 900;
+        margin-top: 12px;
+      }
+    </style>
+  
+<script>
+/* ✅ Fix: Firebase Authorized Domain issue
+   افتح المشروع على localhost بدل 127.0.0.1 */
+try{
+  if (location.hostname === "127.0.0.1") {
+    const u = new URL(location.href);
+    u.hostname = "localhost";
+    location.replace(u.toString());
+  }
+}catch(e){}
+</script>
+
+</head>
+
+  <body>
+    <header class="topnav">
+      <div class="container topnav__wrap">
+        <a class="brand" href="index.html">
+          <img src="p.jpg" alt="Pixology" style="width: 40px; height: 40px" />
+          <span class="brand__text">pexology</span>
+        </a>
+
+        <div class="topnav__actions">
+          <a class="btn btn--outline" href="index.html">رجوع</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="container v-wrap">
+      <div class="v-card">
+        <div class="v-head">
+          <div class="v-avatar" id="avatarBox">
+            <span id="avatarLetter">V</span>
+          </div>
+
+          <div class="v-info">
+            <h2 class="v-name" id="vName">جاري التحميل...</h2>
+            <div class="v-id">Volunteer ID: <b id="vId">—</b></div>
+            <div class="muted">
+              صفحة ساعات التطوع (الرسم البياني + QR للتحقق)
+            </div>
+            <div id="err" class="errorBox" style="display: none"></div>
+          </div>
+
+          <div class="v-badges">
+            <span class="pill pill--gold" id="statusBadge">—</span>
+            <span class="pill pill--blue">Hours <b id="hoursBadge">—</b></span>
+          </div>
+        </div>
+
+        <div class="v-body">
+          <div class="chart-grid">
+            <section class="panel">
+              <h3>إجمالي ساعات التطوع</h3>
+              <div class="muted">مجموع الساعات المسجلة للمتطوع</div>
+              <div class="big-number">
+                <span id="hoursNum">—</span> <small>ساعة</small>
+              </div>
+              <div style="margin-top: 12px">
+                <canvas id="donut"></canvas>
+              </div>
+
+              <div class="qrBox">
+                <b>QR للتحقق من المتطوع</b>
+                <div
+                  class="muted"
+                  id="verifyUrlText"
+                  style="text-align: center; word-break: break-word"
+                ></div>
+                <div id="qrcode"></div>
+                <small class="muted">امسح الـ QR لفتح صفحة Verify</small>
+              </div>
+            </section>
+
+            <section class="panel">
+              <h3>توزيع الساعات</h3>
+              <div class="muted" id="distText">—</div>
+              <canvas id="bars"></canvas>
+
+              <div class="row-actions">
+                <a class="btn btn--solid" id="verifyBtn" href="verify.html"
+                  >Verify</a
+                >
+                <a class="btn btn--outline" href="index.html">رجوع للمتطوعين</a>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+
+    <script type="module">
+      import { db } from "./firebase.js";
+      import {
+        collection,
+        query,
+        where,
+        getDocs,
+      } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+      function getParam(name, fallback = "") {
+        const url = new URL(window.location.href);
+        return url.searchParams.get(name) ?? fallback;
+      }
+
+      function showError(text) {
+        const err = document.getElementById("err");
+        if (!err) return;
+        err.textContent = text;
+        err.style.display = "block";
+      }
+
+      const avatarBox = document.getElementById("avatarBox");
+      const avatarLetter = document.getElementById("avatarLetter");
+
+      function fitCanvas(canvas) {
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.floor(rect.width * dpr);
+        canvas.height = Math.floor(rect.height * dpr);
+        const ctx = canvas.getContext("2d");
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        return ctx;
+      }
+
+      function drawDonut(canvas, value, goal) {
+        const ctx = fitCanvas(canvas);
+        const w = canvas.getBoundingClientRect().width;
+        const h = canvas.getBoundingClientRect().height;
+
+        const cx = w / 2;
+        const cy = h / 2;
+        const r = Math.min(w, h) * 0.32;
+        const thickness = Math.max(14, r * 0.28);
+
+        const pct = Math.max(0, Math.min(1, value / goal));
+
+        ctx.clearRect(0, 0, w, h);
+        ctx.lineWidth = thickness;
+        ctx.lineCap = "round";
+
+        ctx.beginPath();
+        ctx.strokeStyle = "rgba(15,23,42,0.10)";
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+
+        const start = -Math.PI / 2;
+        const end = start + pct * Math.PI * 2;
+        ctx.beginPath();
+        ctx.strokeStyle = "rgba(240,199,94,0.95)";
+        ctx.arc(cx, cy, r, start, end);
+        ctx.stroke();
+
+        ctx.fillStyle = "rgba(15,23,42,0.85)";
+        ctx.font = "800 22px system-ui, Segoe UI, Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(Math.round(pct * 100) + "%", cx, cy - 4);
+
+        ctx.fillStyle = "rgba(107,114,128,1)";
+        ctx.font = "700 12px system-ui, Segoe UI, Arial";
+        ctx.fillText("من الهدف " + goal + " ساعة", cx, cy + 18);
+      }
+
+      function drawBars(canvas, labels, values) {
+        const ctx = fitCanvas(canvas);
+        const w = canvas.getBoundingClientRect().width;
+        const h = canvas.getBoundingClientRect().height;
+
+        ctx.clearRect(0, 0, w, h);
+
+        const padding = 22;
+        const chartW = w - padding * 2;
+        const chartH = h - padding * 2;
+
+        const maxV = Math.max(...values, 1);
+        const barCount = values.length;
+        const gap = 12;
+        const barW = (chartW - gap * (barCount - 1)) / barCount;
+
+        ctx.strokeStyle = "rgba(15,23,42,0.12)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(padding, padding + chartH);
+        ctx.lineTo(padding + chartW, padding + chartH);
+        ctx.stroke();
+
+        for (let i = 0; i < barCount; i++) {
+          const x = padding + i * (barW + gap);
+          const v = values[i];
+          const bh = (v / maxV) * (chartH - 24);
+          const y = padding + chartH - bh;
+
+          ctx.fillStyle = "rgba(25,168,230,0.85)";
+          ctx.fillRect(x, y, barW, bh);
+
+          ctx.fillStyle = "rgba(15,23,42,0.85)";
+          ctx.font = "800 12px system-ui, Segoe UI, Arial";
+          ctx.textAlign = "center";
+          ctx.fillText(String(v), x + barW / 2, y - 8);
+
+          ctx.fillStyle = "rgba(107,114,128,1)";
+          ctx.font = "700 12px system-ui, Segoe UI, Arial";
+          ctx.textAlign = "center";
+          ctx.fillText(labels[i], x + barW / 2, padding + chartH + 16);
+        }
+      }
+
+      const volunteerId = (getParam("id", "") || "").trim();
+
+      if (!volunteerId) {
+        showError(
+          "❌ مفيش ID في الرابط. لازم تفتح: volunteer.html?id=VOL-000001",
+        );
+        document.getElementById("vName").textContent = "غير صالح";
+        document.getElementById("statusBadge").textContent = "—";
+        document.getElementById("hoursBadge").textContent = "0";
+        document.getElementById("hoursNum").textContent = "0";
+      } else {
+        const qy = query(
+          collection(db, "pixology_volunteers"),
+          where("volunteerId", "==", volunteerId),
+        );
+
+        const snap = await getDocs(qy);
+
+        if (snap.empty) {
+          showError(
+            "❌ المتطوع غير موجود أو لم يتم اعتماده بعد (أو القراءة مقفولة بالقواعد).",
+          );
+          document.getElementById("vName").textContent = "غير موجود";
+          document.getElementById("vId").textContent = volunteerId;
+          document.getElementById("statusBadge").textContent = "Not Found";
+          document.getElementById("hoursBadge").textContent = "0";
+          document.getElementById("hoursNum").textContent = "0";
+        } else {
+          const d = snap.docs[0].data() || {};
+
+          const name = d.name || "متطوع";
+          const hours = Number(d.hours ?? 0) || 0;
+          const status = d.status || "Active";
+
+          document.getElementById("vName").textContent = name;
+          document.getElementById("vId").textContent =
+            d.volunteerId || volunteerId;
+
+          document.getElementById("hoursNum").textContent = String(hours);
+          document.getElementById("hoursBadge").textContent = String(hours);
+
+          const statusBadge = document.getElementById("statusBadge");
+          statusBadge.innerHTML = `${status} <b>✔</b>`;
+
+          const photo = d.photoData || d.photoUrl || "";
+          if (photo) {
+            avatarBox.innerHTML = `<img src="${photo}" alt="${name}" />`;
+          } else {
+            const letter = name.trim()[0] || "V";
+            avatarLetter.textContent = letter;
+          }
+
+          const goal = 24;
+          drawDonut(document.getElementById("donut"), hours, goal);
+
+          const labels = [
+            "السبت",
+            "الاحد",
+            "الاثنين",
+            "الثلاثاء",
+            "الاربعاء",
+            "الخميس",
+            "الجمعة",
+          ];
+          const base = Math.max(0, Math.floor(hours / 7));
+          const rem = hours - base * 7;
+          const values = Array.from(
+            { length: 7 },
+            (_, i) => base + (i < rem ? 1 : 0),
+          );
+
+          document.getElementById("distText").textContent =
+            `${hours} ساعات (مقسّمة على 7 أيام)`;
+          drawBars(document.getElementById("bars"), labels, values);
+
+          window.addEventListener("resize", () => {
+            drawDonut(document.getElementById("donut"), hours, goal);
+            drawBars(document.getElementById("bars"), labels, values);
+          });
+
+          const baseDir = window.location.href.substring(
+            0,
+            window.location.href.lastIndexOf("/") + 1,
+          );
+          const verifyUrl = `${baseDir}verify.html?id=${encodeURIComponent(volunteerId)}`;
+
+          document.getElementById("verifyUrlText").textContent = verifyUrl;
+
+          const verifyBtn = document.getElementById("verifyBtn");
+          if (verifyBtn) verifyBtn.href = verifyUrl;
+
+          const qrBox = document.getElementById("qrcode");
+          qrBox.innerHTML = "";
+          new QRCode(qrBox, { text: verifyUrl, width: 160, height: 160 });
+        }
+      }
+    </script>
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("./sw.js").catch(console.error);
+        });
+      }
+    </script>
+  </body>
+</html>

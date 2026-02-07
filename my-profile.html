@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ملفي الشخصي</title>
+    <link rel="stylesheet" href="style.css" />
+    <meta name="theme-color" content="#0b1620" />
+  
+<script>
+/* ✅ Fix: Firebase Authorized Domain issue
+   افتح المشروع على localhost بدل 127.0.0.1 */
+try{
+  if (location.hostname === "127.0.0.1") {
+    const u = new URL(location.href);
+    u.hostname = "localhost";
+    location.replace(u.toString());
+  }
+}catch(e){}
+</script>
+
+</head>
+
+  <body>
+    <!-- TOP NAV -->
+    <header class="topnav">
+      <div class="container topnav__wrap">
+        <a class="brand" href="index.html">
+          <img src="p.jpg" alt="Pixology" style="width: 180px; height: 80px" />
+        </a>
+
+        <div class="topnav__actions">
+          <button id="btnLogout" type="button" style="display: none">
+            تسجيل خروج
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container" style="padding: 24px 0 70px">
+    <!-- =========================
+         NOTIFICATIONS + TASKS
+    ========================== -->
+    <section class="card" style="margin-top: 14px; padding: 18px; border-radius: 18px" id="tasks">
+      <div style="display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap">
+        <h2 style="margin:0">🔔 الإشعارات</h2>
+        <button class="btn" id="btnMarkNotifs" type="button">تحديد الكل كمقروء</button>
+      </div>
+      <div id="notifList" class="grid" style="margin-top:10px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px"></div>
+    </section>
+
+    <section class="card" style="margin-top: 14px; padding: 18px; border-radius: 18px">
+      <div style="display:flex; justify-content:space-between; gap:10px; align-items:center; flex-wrap:wrap">
+        <h2 style="margin:0">🧩 مهامي</h2>
+        <button class="btn" id="btnRefreshMyTasks" type="button">تحديث</button>
+      </div>
+      <p style="margin:8px 0 0; color:#64748b; line-height:1.8">
+        لما تدوس “موافقة” على المهمة، العداد يبدأ فورًا حسب عدد الساعات.
+      </p>
+      <div id="myTasksList" class="grid" style="margin-top:10px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px"></div>
+    </section>
+
+      <!-- بطاقة الملف -->
+      <div class="v-card" style="padding: 18px">
+        <h2 style="margin: 0 0 14px">ملفي الشخصي</h2>
+
+        <p id="msg" class="muted" style="margin: 0 0 14px; display: none"></p>
+
+        <div
+          style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap"
+        >
+          <div
+            id="pPhoto"
+            style="
+              width: 84px;
+              height: 84px;
+              border-radius: 18px;
+              background: #0b2230;
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              overflow: hidden;
+              display: grid;
+              place-items: center;
+              color: #fff;
+              font-weight: 800;
+              font-size: 28px;
+            "
+          >
+            —
+          </div>
+
+          <div style="min-width: 260px">
+            <div style="font-weight: 800; font-size: 18px" id="pName">—</div>
+            <div class="muted" id="pEmail" style="margin-top: 6px">—</div>
+          </div>
+        </div>
+
+        <hr
+          style="margin: 16px 0; border: 0; border-top: 1px solid var(--border)"
+        />
+
+        <div style="display: grid; gap: 10px">
+          <div>
+            <b>UID:</b> <span id="pUid">—</span>
+            <button
+              id="btnCopyUid"
+              class="btn btn--outline"
+              type="button"
+              style="margin-inline-start: 10px"
+            >
+              نسخ UID
+            </button>
+          </div>
+
+          <div><b>آخر تسجيل دخول:</b> <span id="pLast">—</span></div>
+
+          <div><b>النوع (Role):</b> <span id="pRole">—</span></div>
+          <div><b>الحالة (Active):</b> <span id="pActive">—</span></div>
+
+          <div
+            style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px"
+          >
+            <a
+              id="pPublicLink"
+              class="btn btn--solid"
+              href="#"
+              style="display: none"
+            >
+              فتح صفحتي العامة
+            </a>
+
+            <button
+              id="btnCopyPublic"
+              class="btn btn--outline"
+              type="button"
+              style="display: none"
+            >
+              نسخ رابط الملف العام
+            </button>
+
+            <button id="btnPDF" class="btn btn--outline" type="button">
+              تحميل تقرير PDF
+            </button>
+
+            <button
+              id="btnResetRole"
+              class="btn btn--outline"
+              type="button"
+              style="display: none"
+            >
+              تغيير النوع (متطوع/مؤسسة)
+            </button>
+
+            <button id="btnClearDevice" class="btn btn--outline" type="button">
+              مسح بيانات الجهاز
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- بطاقة النقاط والمستوى -->
+      <div class="v-card" style="margin-top: 14px; padding: 16px">
+        <h3 style="margin: 0 0 10px">النقاط والمستوى</h3>
+
+        <div
+          style="display: flex; gap: 14px; flex-wrap: wrap; align-items: center"
+        >
+          <div
+            style="
+              min-width: 120px;
+              padding: 10px 14px;
+              border-radius: 14px;
+              border: 1px solid var(--border);
+              background: var(--card);
+            "
+          >
+            <div class="muted">النقاط</div>
+            <div style="font-size: 24px; font-weight: 900" id="pPoints">—</div>
+          </div>
+
+          <div style="flex: 1; min-width: 220px">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 6px;
+              "
+            >
+              <span class="muted">المستوى</span>
+              <b id="pLevel">—</b>
+            </div>
+
+            <div
+              style="
+                height: 12px;
+                background: rgba(0, 0, 0, 0.08);
+                border-radius: 999px;
+                overflow: hidden;
+                border: 1px solid var(--border);
+              "
+            >
+              <div
+                id="pBar"
+                style="height: 100%; width: 0%; background: var(--gold-600)"
+              ></div>
+            </div>
+
+            <div class="muted" style="margin-top: 6px" id="pNext">—</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap">
+          <span
+            id="b1"
+            style="
+              display: none;
+              padding: 6px 10px;
+              border-radius: 999px;
+              border: 1px solid var(--border);
+              background: var(--card);
+            "
+            >🏅 نشيط</span
+          >
+          <span
+            id="b2"
+            style="
+              display: none;
+              padding: 6px 10px;
+              border-radius: 999px;
+              border: 1px solid var(--border);
+              background: var(--card);
+            "
+            >⭐ مميز</span
+          >
+          <span
+            id="b3"
+            style="
+              display: none;
+              padding: 6px 10px;
+              border-radius: 999px;
+              border: 1px solid var(--border);
+              background: var(--card);
+            "
+            >👑 خبير</span
+          >
+        </div>
+      </div>
+
+      <!-- بطاقة الإحصائيات -->
+      <div class="v-card" style="margin-top: 14px; padding: 16px">
+        <h3 style="margin: 0 0 10px">إحصائياتي</h3>
+
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+          "
+        >
+          <div
+            style="
+              padding: 12px;
+              border-radius: 14px;
+              border: 1px solid var(--border);
+              background: var(--card);
+            "
+          >
+            <div class="muted">الساعات</div>
+            <div style="font-size: 22px; font-weight: 900" id="sHours">—</div>
+          </div>
+
+          <div
+            style="
+              padding: 12px;
+              border-radius: 14px;
+              border: 1px solid var(--border);
+              background: var(--card);
+            "
+          >
+            <div class="muted">المشاركات</div>
+            <div style="font-size: 22px; font-weight: 900" id="sEvents">—</div>
+          </div>
+
+          <div
+            style="
+              padding: 12px;
+              border-radius: 14px;
+              border: 1px solid var(--border);
+              background: var(--card);
+            "
+          >
+            <div class="muted">تاريخ الانضمام</div>
+            <div style="font-size: 16px; font-weight: 900" id="sJoin">—</div>
+          </div>
+
+          <div
+            style="
+              padding: 12px;
+              border-radius: 14px;
+              border: 1px solid var(--border);
+              background: var(--card);
+            "
+          >
+            <div class="muted">آخر تحديث</div>
+            <div style="font-size: 16px; font-weight: 900" id="sUpdate">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="v-card" style="margin-top: 14px; padding: 16px">
+        <h3 style="margin: 0 0 10px">🧩 التاسكات</h3>
+        <div id="taskList" style="display: grid; gap: 10px">
+          <p class="muted">لا توجد تاسكات</p>
+        </div>
+      </div>
+
+      <!-- بطاقة الإشعارات -->
+      <div class="v-card" style="margin-top: 14px; padding: 16px">
+        <h3 style="margin: 0 0 10px">🔔 الإشعارات</h3>
+        <div id="notifyList" style="display: grid; gap: 10px">
+          <p class="muted">لا يوجد إشعارات</p>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="my-profile.js"></script>
+  </body>
+</html>

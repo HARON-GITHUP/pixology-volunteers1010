@@ -1,0 +1,22 @@
+// FIRESTORE RULES - Recommended tightening for tasks & notifications
+// Your current rules are good. These are EXTRA constraints (optional):
+//
+// match /tasks/{id} {
+//   allow create: if isAdmin();
+//
+//   allow read: if signedIn() && resource.data.assignedTo == request.auth.uid;
+//
+//   // Volunteer update only allowed fields and safe transitions
+//   allow update: if signedIn()
+//     && resource.data.assignedTo == request.auth.uid
+//     && request.resource.data.assignedTo == resource.data.assignedTo
+//     && request.resource.data.createdBy == resource.data.createdBy
+//     && request.resource.data.createdAt == resource.data.createdAt
+//     && (
+//        // pending->accepted OR accepted->completed OR any by admin
+//        (resource.data.status == "pending" && request.resource.data.status == "accepted")
+//        || (resource.data.status == "accepted" && request.resource.data.status == "completed")
+//     );
+//
+//   allow delete: if isAdmin();
+// }

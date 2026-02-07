@@ -1,0 +1,206 @@
+/* ================== SUPER ADMIN STYLE ================== */
+
+body {
+  font-family: Tahoma, Arial;
+  margin: 0;
+  background: #120b0b; /* تمييز للسوبر */
+  color: #eef6ff;
+}
+
+/* ===== TOP BAR ===== */
+.top {
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+/* ===== ACTIONS ===== */
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ===== INPUTS / BUTTONS ===== */
+input,
+select,
+button {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.22);
+  color: #eef6ff;
+}
+
+button {
+  cursor: pointer;
+  font-weight: 900;
+}
+
+/* ===== WRAP ===== */
+.wrap {
+  width: min(1200px, calc(100% - 24px));
+  margin: 18px auto;
+}
+
+/* ===== CARD ===== */
+.card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 16px;
+}
+
+/* ===== TABLE ===== */
+.tableWrap {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+th,
+td {
+  padding: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: right;
+  vertical-align: top;
+}
+
+th {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ===== TEXT ===== */
+.msg {
+  margin: 10px 0 0;
+  font-weight: 700;
+  color: #ffd3d3;
+}
+
+.hint {
+  opacity: 0.85;
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.muted {
+  opacity: 0.85;
+  font-weight: 800;
+}
+
+/* ===== FORM ROW ===== */
+.formRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+
+.formRow input,
+.formRow select {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  min-width: 180px;
+}
+
+/* ===== BUTTON SYSTEM (لأنك مستخدم btn classes) ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(0, 0, 0, 0.22);
+  color: #eef6ff;
+  font-weight: 900;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn--outline {
+  background: transparent;
+}
+
+.btn--solid {
+  background: linear-gradient(135deg, #f0c75e, #caa336);
+  color: #120b0b;
+  border-color: transparent;
+}
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  max-width: min(420px, calc(100% - 36px));
+  background: rgba(15, 23, 42, 0.92);
+  color: #fff;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+  display: none;
+  z-index: 9999;
+  font-weight: 800;
+}
+.toast.show {
+  display: block;
+}
+
+/* ================== MOBILE FIX ================== */
+html,
+body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  .wrap {
+    width: calc(100% - 16px);
+    margin: 12px auto;
+  }
+
+  .top > * {
+    width: 100%;
+  }
+
+  .actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  input,
+  select,
+  button,
+  .btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .formRow {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .formRow input,
+  .formRow select {
+    min-width: 0;
+    width: 100%;
+  }
+}
