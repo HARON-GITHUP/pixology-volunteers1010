@@ -1,28 +1,16 @@
 // debug-overlay.js
 // يظهر الأخطاء بدل ما الصفحة تبقى بيضا (مفيد جدًا على الموبايل)
-// ✅ تم تقييده: يشتغل فقط على localhost أو لو أضفت ?debug=1
 (function () {
-  try {
-    const host = location.hostname;
-    const isLocal = host === "localhost" || host === "127.0.0.1";
-    const qs = new URLSearchParams(location.search);
-    const force = qs.get("debug") === "1" || localStorage.getItem("px_debug") === "1";
-    if (!isLocal && !force) return; // 🔒 لا تفضح أخطاء للمستخدمين في الإنتاج
-  } catch (e) {
-    // لو حصل خطأ في القراءة، ما تشتغلش
-    return;
-  }
+  // شغّال فقط على localhost أو لو فتحت الرابط بـ ?debug=1
+  const allow = location.hostname === "localhost" || location.hostname === "127.0.0.1" || new URLSearchParams(location.search).get("debug") === "1";
+  if (!allow) return;
 
   const box = document.createElement("div");
   box.style.cssText =
     "position:fixed;inset:10px;z-index:999999;background:#0b1220;color:#fff;padding:12px;border-radius:14px;font:14px/1.6 system-ui;overflow:auto;display:none;white-space:pre-wrap";
-
   function mount() {
-    try {
-      document.body.appendChild(box);
-    } catch (e) {}
+    try { document.body.appendChild(box); } catch (e) {}
   }
-
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", mount);
   } else {

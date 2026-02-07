@@ -1,248 +1,286 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-  <header class="top">
-  <h1>لوحة التحكم (Pixology)</h1>
-  <link rel="stylesheet" href="style.css?v=20260207012958" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>لوحة التحكم | Pixology</title>
 
-  <div class="actions">
-    <input id="search" placeholder="بحث بالاسم أو ID..." />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="theme-color" content="#0b1620" />
 
-    <select id="filterStage">
-      <option value="">كل الحالات</option>
-      <option value="Active">Active</option>
-      <option value="Inactive">Inactive</option>
-      <option value="Certified">Certified</option>
-    </select>
+    <link rel="icon" type="image/png" href="icon-192.png" />
+    <link rel="stylesheet" href="style.css?v=20260207" />
+    <link rel="stylesheet" href="admin.css?v=20260207" />
+  </head>
 
-    <!-- زر السوبر أدمن (مخفي افتراضيًا) -->
-    <a id="goSuper" href="super.html" style="display:none">
-      سوبر أدمن
-    </a>
+  <body class="admin-page">
+    <!-- TOP BAR -->
+    <header class="admin-topbar">
+      <div class="admin-topbar__left">
+        <button class="admin-burger" id="adminBurger" type="button" aria-label="فتح القائمة">
+          ☰
+        </button>
+        <h1 class="admin-title">لوحة التحكم (Pixology)</h1>
+      </div>
 
-    <button id="exportCsv">تصدير CSV</button>
-    <button id="logout">تسجيل خروج</button>
-    <button id="btnAdminGoogle" class="btn btn--solid">
-  تسجيل أدمن بجوجل
-</button>
+      <div class="admin-topbar__right actions">
+        <input id="search" placeholder="بحث بالاسم أو ID..." />
 
-<p id="adminUidMsg" style="margin-top:10px; font-weight:700;"></p>
+        <select id="filterStage">
+          <option value="">كل الحالات</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+          <option value="Certified">Certified</option>
+        </select>
 
-  </div>
-</header>
+        <!-- زر السوبر أدمن (مخفي افتراضيًا) -->
+        <a id="goSuper" class="btn btn--outline" href="super.html" style="display:none">سوبر أدمن</a>
 
+        <button id="exportCsv" class="btn btn--outline" type="button">تصدير CSV</button>
+        <button id="logout" class="btn btn--outline" type="button">تسجيل خروج</button>
 
-    <main class="wrap">
-      <!-- Login -->
-      <section class="card" id="loginBox">
-        <h2>تسجيل دخول الأدمن</h2>
-        <input id="email" type="email" placeholder="Email" />
-        <input id="password" type="password" placeholder="Password" />
-        <button id="login">دخول</button>
-        <p id="loginMsg" class="msg"></p>
-      </section>
+        <button id="btnAdminGoogle" class="btn btn--solid" type="button">تسجيل أدمن بجوجل</button>
+      </div>
+    </header>
 
-      <!-- Data -->
-      <section class="card" id="dataBox" style="display: none">
-        <!-- ✅ طلبات التطوع -->
-        <h2>طلبات التطوع (Pending)</h2>
-        <div class="hint">
-          * اضغط موافقة لإصدار ID رسمي ونقل الطلب لقائمة المتطوعين
+    <div class="admin-layout">
+      <!-- SIDEBAR -->
+      <aside class="admin-sidebar" id="adminSidebar" aria-label="قائمة لوحة التحكم">
+        <a class="admin-side__brand" href="index.html">
+          <span class="admin-side__dot"></span>
+          <span>Pixology</span>
+        </a>
+
+        <nav class="admin-side__nav">
+          <a class="admin-side__link is-active" href="admin.html">لوحة التحكم</a>
+          <a class="admin-side__link" href="dashboard.html">Dashboard</a>
+          <a class="admin-side__link" href="tasks.html">المهام</a>
+          <a class="admin-side__link" href="events.html">الفعاليات</a>
+          <a class="admin-side__link" href="leaderboard.html">الترتيب</a>
+          <a class="admin-side__link" href="achievements.html">الإنجازات</a>
+        </nav>
+
+        <div class="admin-side__note">
+          <p id="adminUidMsg" class="admin-uid"></p>
+          <small class="muted">لو مش ظاهر لك بيانات الأدمن، تأكد إن حسابك Admin + Active في users.</small>
         </div>
+      </aside>
 
-        <div class="tableWrap" style="margin-bottom: 18px">
-          <table>
-            <thead>
-              <tr>
-                <th>وقت</th>
-                <th>اسم</th>
-                <th>رقم الهاتف</th>
-                <th>الجنس</th>
-                <th>تاريخ الانضمام</th>
-                <th>الدولة</th>
-                <th>ملاحظات</th>
-                <th>إجراء</th>
-              </tr>
-            </thead>
-            <tbody id="reqRows"></tbody>
-          </table>
-        </div>
+      <!-- MAIN -->
+      <main class="admin-main wrap">
+        <!-- Login -->
+        <section class="card" id="loginBox">
+          <h2>تسجيل دخول الأدمن</h2>
+          <div class="admin-grid-2">
+            <input id="email" type="email" placeholder="Email" />
+            <input id="password" type="password" placeholder="Password" />
+          </div>
+          <div class="admin-row">
+            <button id="login" class="btn btn--solid" type="button">دخول</button>
+            <p id="loginMsg" class="msg"></p>
+          </div>
+        </section>
 
-        <!-- ✅ إضافة متطوع يدويًا (Step 2) -->
-        <h2 style="margin-top: 22px">إضافة متطوع يدويًا</h2>
-        <div class="hint">* للأدمن فقط — هيطلع Volunteer ID تلقائي</div>
-
-        <div class="card" style="margin: 10px 0 14px; padding: 14px">
-          <div style="display: grid; gap: 10px; grid-template-columns: 1fr 1fr">
-            <input id="mName" placeholder="اسم المتطوع" />
-            <input id="mPhone" placeholder="رقم الهاتف" />
-
-            <select id="mGender">
-              <option value="">الجنس</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-            </select>
-
-            <input
-              id="mJoinedAt"
-              placeholder="تاريخ الانضمام (مثال: 2026-01-28)"
-            />
-
-            <input id="mCountry" placeholder="الدولة" />
-            <input id="mNotes" placeholder="ملاحظات" />
+        <!-- Data -->
+        <section class="card" id="dataBox" style="display:none">
+          <div class="admin-section__head">
+            <h2>طلبات التطوع (Pending)</h2>
+            <div class="hint">* اضغط موافقة لإصدار ID رسمي ونقل الطلب لقائمة المتطوعين</div>
           </div>
 
-          <div
-            style="
-              margin-top: 10px;
-              display: flex;
-              gap: 10px;
-              flex-wrap: wrap;
-              align-items: center;
-            "
-          >
-            <input id="mPhoto" type="file" accept="image/*" />
-            <button id="mAddBtn" class="btn btn--solid" type="button">
-              ➕ إضافة
-            </button>
-            <small class="muted" id="mMsg"></small>
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>وقت</th>
+                  <th>اسم</th>
+                  <th>رقم الهاتف</th>
+                  <th>الجنس</th>
+                  <th>تاريخ الانضمام</th>
+                  <th>الدولة</th>
+                  <th>ملاحظات</th>
+                  <th>إجراء</th>
+                </tr>
+              </thead>
+              <tbody id="reqRows"></tbody>
+            </table>
           </div>
 
-          <div class="hint" style="margin-top: 8px">
-            * لو الصورة كبيرة قوي الأفضل ما ترفعهاش دلوقتي (عشان حجم Firestore)
+          <div class="admin-split"></div>
+
+          <div class="admin-section__head">
+            <h2>إضافة متطوع يدويًا</h2>
+            <div class="hint">* للأدمن فقط — هيطلع Volunteer ID تلقائي</div>
           </div>
-        </div>
 
-        <!-- ✅ المتطوعين المعتمدين -->
-        <h2>المتطوعين (Approved)</h2>
-        <div class="hint">* البيانات تظهر للأدمن فقط</div>
+          <div class="card admin-subcard">
+            <div class="admin-grid-2">
+              <input id="mName" placeholder="اسم المتطوع" />
+              <input id="mPhone" placeholder="رقم الهاتف" />
 
-        <div class="actions" style="margin: 10px 0 14px; gap: 10px">
-          <button id="deleteSelected" class="btn btn--outline" type="button">
-            🗑️ مسح المحدد
-          </button>
-          <button id="clearSelection" class="btn btn--outline" type="button">
-            ✖️ إلغاء التحديد
-          </button>
-        </div>
+              <select id="mGender">
+                <option value="">الجنس</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
 
-        <div class="tableWrap">
-          <table>
-            <thead>
-              <tr>
-                <th><input type="checkbox" id="selectAll" /></th>
-                <th>وقت</th>
-                <th>صورة</th>
-                <th>اسم المتطوع</th>
-                <th>Volunteer ID</th>
-                <th>رقم المتطوع</th>
-                <th>الجنس</th>
-                <th>تاريخ الانضمام</th>
-                <th>الساعات</th>
-                <th>الحالة</th>
-                <th>ملاحظات</th>
-                <th>إجراء</th>
-              </tr>
-            </thead>
-            <tbody id="rows"></tbody>
-          </table>
-        </div>
-      </section>
-    
-      <!-- =========================
-           TASKS (Admin assigns tasks to a specific volunteer)
-      ========================== -->
-      <section class="card" style="margin-top: 16px">
-        <h2 style="margin-top:0">🧩 إدارة المهام</h2>
-        <p style="color:#64748b; line-height:1.8; margin-top:0">
-          هنا تقدر تضيف مهمة لمتطوع معيّن. المتطوع هيوصله إشعار، ولما يوافق يبدأ العداد (بالساعات) تلقائيًا.
-        </p>
-
-        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px">
-          <div class="card" style="padding:14px; border-radius:16px">
-            <label style="display:block; font-weight:700; margin-bottom:6px">اختار المتطوع</label>
-            <select id="taskVolunteer" style="width:100%; padding:10px; border-radius:12px">
-              <option value="">تحميل المتطوعين...</option>
-            </select>
-            <div style="color:#94a3b8; font-size:13px; margin-top:8px">
-              * القائمة بتجيب المتطوعين من قاعدة البيانات.
+              <input id="mJoinedAt" placeholder="تاريخ الانضمام (مثال: 2026-01-28)" />
+              <input id="mCountry" placeholder="الدولة" />
+              <input id="mNotes" placeholder="ملاحظات" />
             </div>
+
+            <div class="admin-row admin-row--wrap">
+              <input id="mPhoto" type="file" accept="image/*" />
+              <button id="mAddBtn" class="btn btn--solid" type="button">➕ إضافة</button>
+              <small class="muted" id="mMsg"></small>
+            </div>
+
+            <div class="hint">* لو الصورة كبيرة قوي الأفضل ما ترفعهاش دلوقتي (عشان حجم Firestore)</div>
           </div>
 
-          <div class="card" style="padding:14px; border-radius:16px">
-            <label style="display:block; font-weight:700; margin-bottom:6px">عنوان المهمة</label>
-            <input id="taskTitle" placeholder="مثال: تجهيز بوست للدعوة" style="width:100%; padding:10px; border-radius:12px" />
-            <label style="display:block; font-weight:700; margin:10px 0 6px">المدة (ساعات)</label>
-            <input id="taskHours" type="number" min="1" value="5" style="width:100%; padding:10px; border-radius:12px" />
+          <div class="admin-split"></div>
+
+          <div class="admin-section__head">
+            <h2>المتطوعين (Approved)</h2>
+            <div class="hint">* البيانات تظهر للأدمن فقط</div>
           </div>
-            <div class="field">
-              <label for="taskPoints">⭐ النقاط</label>
-              <input id="taskPoints" type="number" min="0" value="10" placeholder="مثلاً 10" />
+
+          <div class="admin-row admin-row--wrap" style="margin: 10px 0 14px">
+            <button id="deleteSelected" class="btn btn--outline" type="button">🗑️ مسح المحدد</button>
+            <button id="clearSelection" class="btn btn--outline" type="button">✖️ إلغاء التحديد</button>
+          </div>
+
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="selectAll" /></th>
+                  <th>وقت</th>
+                  <th>صورة</th>
+                  <th>اسم المتطوع</th>
+                  <th>Volunteer ID</th>
+                  <th>رقم المتطوع</th>
+                  <th>الجنس</th>
+                  <th>تاريخ الانضمام</th>
+                  <th>الساعات</th>
+                  <th>الحالة</th>
+                  <th>ملاحظات</th>
+                  <th>إجراء</th>
+                </tr>
+              </thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- TASKS -->
+        <section class="card admin-block">
+          <div class="admin-section__head">
+            <h2>🧩 إدارة المهام</h2>
+            <p class="muted" style="margin:0">هنا تقدر تضيف مهمة لمتطوع معيّن. المتطوع هيوصله إشعار، ولما يوافق يبدأ العداد (بالساعات) تلقائيًا.</p>
+          </div>
+
+          <div class="admin-grid-3">
+            <div class="card admin-subcard">
+              <label class="lbl">اختار المتطوع</label>
+              <select id="taskVolunteer">
+                <option value="">تحميل المتطوعين...</option>
+              </select>
+              <div class="hint">* القائمة بتجيب المتطوعين من قاعدة البيانات.</div>
             </div>
-            <div class="field">
-              <label style="display:flex;gap:10px;align-items:center">
+
+            <div class="card admin-subcard">
+              <label class="lbl">عنوان المهمة</label>
+              <input id="taskTitle" placeholder="مثال: تجهيز بوست للدعوة" />
+              <div class="admin-grid-2" style="margin-top:10px">
+                <div class="field">
+                  <label class="lbl" for="taskHours">المدة (ساعات)</label>
+                  <input id="taskHours" type="number" min="1" value="5" />
+                </div>
+                <div class="field">
+                  <label class="lbl" for="taskPoints">⭐ النقاط</label>
+                  <input id="taskPoints" type="number" min="0" value="10" placeholder="مثلاً 10" />
+                </div>
+              </div>
+
+              <label class="chk" style="margin-top:10px">
                 <input id="taskRequireProof" type="checkbox" />
                 يتطلب إثبات (صورة/PDF)
               </label>
             </div>
 
-          <div class="card" style="padding:14px; border-radius:16px">
-            <label style="display:block; font-weight:700; margin-bottom:6px">وصف المهمة</label>
-            <textarea id="taskDesc" rows="5" placeholder="اكتب تفاصيل المهمة..." style="width:100%; padding:10px; border-radius:12px"></textarea>
-            <button id="btnCreateTask" class="btn btn--solid" style="width:100%; margin-top:10px">
-              ➕ إرسال المهمة
-            </button>
+            <div class="card admin-subcard">
+              <label class="lbl">وصف المهمة</label>
+              <textarea id="taskDesc" rows="6" placeholder="اكتب تفاصيل المهمة..."></textarea>
+              <button id="btnCreateTask" class="btn btn--solid" type="button" style="width:100%; margin-top:10px">➕ إرسال المهمة</button>
+            </div>
           </div>
-        </div>
 
-        <div class="card" style="margin-top: 12px; padding: 14px; border-radius: 16px">
-          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between">
-            <h3 style="margin:0">📌 أحدث المهام</h3>
-            <button id="btnRefreshTasks" class="btn" type="button">تحديث</button>
+          <div class="card admin-subcard" style="margin-top:12px">
+            <div class="admin-row admin-row--between">
+              <h3 style="margin:0">📌 أحدث المهام</h3>
+              <button id="btnRefreshTasks" class="btn btn--outline" type="button">تحديث</button>
+            </div>
+            <div id="adminTasksList" class="admin-cards"></div>
           </div>
-          <div id="adminTasksList" class="grid" style="margin-top:10px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px"></div>
-        </div>
-      </section>
+        </section>
 
+        <!-- Events approvals -->
+        <section class="card admin-block">
+          <div class="admin-section__head">
+            <h2>✅ اعتماد حضور الفعاليات</h2>
+            <div class="muted">طلبات حضور Pending. اعتمد/ارفض لإضافة النقاط والساعات.</div>
+          </div>
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>التاريخ</th>
+                  <th>Event ID</th>
+                  <th>UID</th>
+                  <th>الإجراء</th>
+                </tr>
+              </thead>
+              <tbody id="evRegRows"></tbody>
+            </table>
+          </div>
+        </section>
 
-      <section class="card" style="margin-top:14px;padding:16px;border-radius:18px">
-        <h2 style="margin:0 0 10px">✅ اعتماد حضور الفعاليات</h2>
-        <div style="color:#64748b;margin-bottom:10px;line-height:1.9">طلبات حضور Pending. اعتمد/ارفض لإضافة النقاط والساعات.</div>
-        <div style="overflow:auto">
-          <table style="width:100%; border-collapse:collapse">
-            <thead><tr>
-              <th style="text-align:right;padding:10px">التاريخ</th>
-              <th style="text-align:right;padding:10px">Event ID</th>
-              <th style="text-align:right;padding:10px">UID</th>
-              <th style="text-align:right;padding:10px">الإجراء</th>
-            </tr></thead>
-            <tbody id="evRegRows"></tbody>
-          </table>
-        </div>
-      </section>
+        <!-- Proof approvals -->
+        <section class="card admin-block">
+          <div class="admin-section__head">
+            <h2>📎 اعتماد إثباتات المهام</h2>
+            <div class="muted">إثباتات Pending. لو المهمة requireProof ✅، الاعتماد يضيف نقاط/ساعات ويقفل المهمة.</div>
+          </div>
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>التاريخ</th>
+                  <th>Task ID</th>
+                  <th>UID</th>
+                  <th>الإثبات</th>
+                  <th>الإجراء</th>
+                </tr>
+              </thead>
+              <tbody id="subRows"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
 
-      <section class="card" style="margin-top:14px;padding:16px;border-radius:18px">
-        <h2 style="margin:0 0 10px">📎 اعتماد إثباتات المهام</h2>
-        <div style="color:#64748b;margin-bottom:10px;line-height:1.9">إثباتات Pending. لو المهمة requireProof ✅، الاعتماد يضيف نقاط/ساعات ويقفل المهمة.</div>
-        <div style="overflow:auto">
-          <table style="width:100%; border-collapse:collapse">
-            <thead><tr>
-              <th style="text-align:right;padding:10px">التاريخ</th>
-              <th style="text-align:right;padding:10px">Task ID</th>
-              <th style="text-align:right;padding:10px">UID</th>
-              <th style="text-align:right;padding:10px">الإثبات</th>
-              <th style="text-align:right;padding:10px">الإجراء</th>
-            </tr></thead>
-            <tbody id="subRows"></tbody>
-          </table>
-        </div>
-      </section>
-</main>
-
-    <script type="module" src="admin.js?v=20260207012958"></script>
-
+    <script type="module" src="admin.js?v=20260207"></script>
     <div id="toast" class="toast" aria-live="polite"></div>
 
     <script>
+      // Sidebar toggle (mobile)
+      (function(){
+        const burger = document.getElementById('adminBurger');
+        const side = document.getElementById('adminSidebar');
+        burger?.addEventListener('click', () => side?.classList.toggle('is-open'));
+      })();
+
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
           navigator.serviceWorker.register("./sw.js").catch(console.error);
