@@ -1,8 +1,9 @@
-guardAuth({ redirectTo: 'register.html', message: 'سجّل دخول عشان تفتح ملفك الشخصي.' });
 // my-profile.js (FULL CLEAN VERSION)
 import { auth, db } from "./firebase.js";
 window.authRef = auth;
 import { toast, setLoading, guardAuth } from "./ui.js";
+
+guardAuth({ redirectTo: "index.html", message: "سجّل دخول عشان تفتح ملفك الشخصي." });
 
 import {
   onAuthStateChanged,

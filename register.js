@@ -19,6 +19,8 @@ import {
   where,
   getDocs,
   limit,
+  doc,
+  setDoc,
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 console.log("REGISTER PROJECT:", db.app.options.projectId);
 
@@ -168,7 +170,12 @@ if (msg) msg.textContent = "";
     const file = photoFileEl?.files?.[0] || null;
     const photoData = file ? await fileToSmallDataURL(file) : "";
 
-    await addDoc(collection(db, "volunteer_requests"), {
+    const user = auth.currentUser;
+    const uid = user?.uid || "";
+    const email = user?.email || "";
+await addDoc(collection(db, "volunteer_requests"), {
+      uid,
+      email,
       name,
 
       // ✅ نخزن 3 أشكال
@@ -191,6 +198,20 @@ if (msg) msg.textContent = "";
       organization: "Pixology Foundation",
       createdAt: serverTimestamp(),
     });
+
+
+    // ✅ أنشئ/حدّث ملف المستخدم كـ Pending (لأن القبول عند الأدمن)
+    if (uid) {
+      await setDoc(doc(db, "users", uid), {
+        email,
+        displayName: name,
+        role: "pending_volunteer",
+        active: false,
+        pending: true,
+        updatedAt: serverTimestamp(),
+      }, { merge: true });
+    }
+
 
     if (msg)
       msg.textContent =

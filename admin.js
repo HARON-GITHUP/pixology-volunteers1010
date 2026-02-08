@@ -1,4 +1,3 @@
-guardAuth({ redirectTo: 'register.html', message: 'لازم تسجّل دخول كإدمن عشان تفتح لوحة التحكم.' });
 // admin.js (FULL CLEAN VERSION)
 import { auth, db } from "./firebase.js";
 import { toast, setLoading, guardAuth } from "./ui.js";
@@ -26,6 +25,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 console.log("PROJECT:", db.app.options.projectId);
+
+guardAuth({ redirectTo: "index.html", message: "لازم تسجّل دخول كإدمن عشان تفتح لوحة التحكم." });
 
 /** ========== Collections ========== */
 const REQ_COL = "volunteer_requests";
@@ -121,6 +122,15 @@ function safeAttr(str) {
   return String(str ?? "").replaceAll('"', "&quot;");
 }
 
+function escapeHtml(s=""){
+  return String(s ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#39;");
+}
+
 function getSelectedIds() {
   return Array.from(document.querySelectorAll(".rowCheck:checked"))
     .map((c) => c.dataset.id)
@@ -177,31 +187,6 @@ async function pushNotification(assignedTo: uid,
 }
 
 /** ✅ Task */
-async function createTaskFor(
-  assignedTo: uid,
-      title,
-  details = "",
-  priority = "normal",
-  dueAt = null,
-) {
-  try {
-    if (!uid) return;
-    await addDoc(collection(db, TASKS_COL), {
-      assignedTo: assignedTo: uid,
-      title: String(title || "Task"),
-      details: String(details || ""),
-      priority: String(priority || "normal"),
-      status: "open",
-      createdBy: auth.currentUser?.uid || "",
-      createdAt: serverTimestamp(),
-      dueAt: dueAt || null,
-      seen: false,
-      seenAt: null,
-    });
-  } catch (e) {
-    console.log("createTaskFor error:", e);
-  }
-}
 
 /** ✅ تحقق Role من users/{uid} */
 async function checkAdmin(user) {
@@ -439,7 +424,7 @@ function renderRequests(reqDocs) {
         <tr data-reqid="${r._docId}">
           <td>${t}</td>
           <td>${r.name || ""}</td>
-          <td>${r.phone || ""}</td>
+          <td>${r.phoneRaw || r.phoneDigits || ""}</td>
           <td>${r.gender || ""}</td>
           <td>${r.joinedAt || ""}</td>
           <td>${country}</td>
@@ -493,12 +478,14 @@ reqRowsEl?.addEventListener("click", async (e) => {
         if (currentStatus !== "Pending") return;
 
         const volunteerId = await generateVolunteerId();
-        const volRef = doc(db, VOL_COL, volunteerId);
+        const userUid = (r.uid || r.userUid || "").trim();
+        const volDocId = userUid || volunteerId;
+        const volRef = doc(db, VOL_COL, volDocId);
 
         tx.set(volRef, {
           name: r.name || "",
           volunteerId,
-          phone: r.phone || r.phoneRaw || "",
+          phone: r.phoneRaw || r.phoneDigits || "",
           gender: r.gender || "",
           joinedAt: r.joinedAt || "",
           country: r.country || "مصر",
@@ -511,18 +498,33 @@ reqRowsEl?.addEventListener("click", async (e) => {
           createdFromRequest: true,
           requestId: reqId,
           approvedByUid: auth.currentUser?.uid || "",
-          userUid: r.uid || r.userUid || "",
+          userUid: userUid || "", uid: userUid || "", email: r.email || "",
         });
 
         tx.update(reqRef, {
           status: "Approved",
           volunteerId,
+          uid: userUid || r.uid || r.userUid || "",
+          email: r.email || "",
           approvedAt: serverTimestamp(),
           approvedByUid: auth.currentUser?.uid || "",
         });
       });
 
       showToast("✅ تم قبول الطلب");
+      // ✅ تفعيل حساب المستخدم كـ Volunteer
+      if (requestUid) {
+        await setDoc(doc(db, "users", requestUid), {
+          role: "volunteer",
+          active: true,
+          pending: false,
+          volunteerId: null,
+          updatedAt: serverTimestamp(),
+          approvedAt: serverTimestamp(),
+          approvedByUid: auth.currentUser?.uid || "",
+        }, { merge: true });
+      }
+
       await auditLog("request_approved", { reqId, requestUid, requestName });
 
       if (requestUid) {
@@ -532,14 +534,7 @@ reqRowsEl?.addEventListener("click", async (e) => {
           `تم قبول طلب التطوع الخاص بك${requestName ? ` يا ${requestName}` : ""}.`,
           "success",
         );
-
-        await createTaskFor(
-          requestUid,
-          "استكمال بيانات الملف الشخصي",
-          "افتح ملفك الشخصي وتأكد من البيانات (الصورة / الاسم / أي معلومات ناقصة).",
-          "normal",
-        );
-      }
+}
     } else {
       await updateDoc(doc(db, REQ_COL, reqId), {
         status: "Rejected",
@@ -755,9 +750,7 @@ rowsEl?.addEventListener("click", async (e) => {
     btn.textContent = "جارٍ...";
 
     try {
-      await createTaskFor(userUid, title, details, priority);
-
-      await pushNotification(
+await pushNotification(
         userUid,
         "لديك مهمة جديدة ✅",
         `${title}${details ? ` — ${details}` : ""}`,
@@ -1062,14 +1055,13 @@ async function loadVolunteersForTasks(){
   taskVolunteer.innerHTML = '<option value="">تحميل المتطوعين...</option>';
 
   try{
-    // Prefer pixology_volunteers collection (approved volunteers)
     const snap = await getDocs(collection(db, "pixology_volunteers"));
     const items = snap.docs.map(d => {
       const data = d.data() || {};
-      const uid = data.userUid || data.uid || "";
+      const uid = data.userUid || data.uid || d.id || "";
       const name = data.name || data.fullName || data.email || uid;
-      return { assignedTo: uid,
-      name, email: data.email || "" };
+      const email = data.email || "";
+      return { uid, name, email };
     }).filter(x => x.uid);
 
     if (!items.length){
@@ -1077,10 +1069,12 @@ async function loadVolunteersForTasks(){
       return;
     }
 
-    taskVolunteer.innerHTML = '<option value="">— اختار متطوع —</option>' + items
-      .sort((a,b)=> String(a.name).localeCompare(String(b.name), "ar"))
-      .map(v => `<option value="${v.uid}">${v.name}${v.email ? " • "+v.email : ""}</option>`)
-      .join("");
+    taskVolunteer.innerHTML =
+      '<option value="">— اختار متطوع —</option>' +
+      items
+        .sort((a,b)=> String(a.name).localeCompare(String(b.name), "ar"))
+        .map(v => `<option value="${v.uid}">${escapeHtml(v.name)}${v.email ? " • "+escapeHtml(v.email) : ""}</option>`)
+        .join("");
   }catch(e){
     console.error(e);
     taskVolunteer.innerHTML = '<option value="">تعذر تحميل المتطوعين</option>';
